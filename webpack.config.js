@@ -8,7 +8,8 @@ module.exports =
 	devtool: debug ? "inline-sourcemap" : null,
 	entry: 
 	{
-		login: "./resources/javascripts/loginForm.js"
+		login: "./resources/javascripts/loginForm.js",
+		client: "./resources/javascripts/client.js"
 	},
 	output:
 	{
