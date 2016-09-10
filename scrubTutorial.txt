@@ -1,0 +1,89 @@
+ ____                                __                    __                __                                       ___      
+/\  _`\                             /\ \                  /\ \__            /\ \__                   __              /\_ \     
+\ \,\L\_\     ___    _ __   __  __  \ \ \____             \ \ ,_\   __  __  \ \ ,_\    ___    _ __  /\_\      __     \//\ \    
+ \/_\__ \    /'___\ /\`'__\/\ \/\ \  \ \ '__`\             \ \ \/  /\ \/\ \  \ \ \/   / __`\ /\`'__\\/\ \   /'__`\     \ \ \   
+   /\ \L\ \ /\ \__/ \ \ \/ \ \ \_\ \  \ \ \L\ \             \ \ \_ \ \ \_\ \  \ \ \_ /\ \L\ \\ \ \/  \ \ \ /\ \L\.\_    \_\ \_ 
+   \ `\____\\ \____\ \ \_\  \ \____/   \ \_,__/              \ \__\ \ \____/   \ \__\\ \____/ \ \_\   \ \_\\ \__/.\_\   /\____\
+    \/_____/ \/____/  \/_/   \/___/     \/___/                \/__/  \/___/     \/__/ \/___/   \/_/    \/_/ \/__/\/_/   \/____/
+                                                                                                                               
+
+-Vse kaj sem installal se nahaja v package.json                                                                                                                               
+
+Node.js
+	-------------------------------------------------
+	- sudo apt install nodejs
+	- node -v // Preveriš kiro verzijo maš(Ko sem pisal to, sem mel v4.2.6)
+	- V paketu dobiš npm(node package manager)
+	- npm -v // Preveriš kiro verzijo maš(Ko sem pisal to, sem mel 3.5.2)
+
+	- npm install <insert_module_name> --save //Install-a package loalno v projekt. Updajta package.json in obenem installa package v node_modules.
+	- npm install -g <insert_module_name> //Globally install-a package. Isto ko apt.
+	- npm install //Ko se nahajaš v projektu, pogleda package.json in updajta.
+
+
+Express.js
+	-------------------------------------------------
+	- npm install -g express-generator // Installaš express framework
+	- express Camelot // Zgenerira projekt
+	- cd Camlot
+	- npm install // Ko se nahajaš v datoteki camelot. S tem installaš vse pakete, ki so definirani v package.json. Shranijo se v Camelot/node_modules
+
+Nodemon
+	-------------------------------------------------
+	npm install -g nodemon
+	nodemon bin/www // Zaženeš projekt.
+
+Html templating engine - Handlebars
+	-------------------------------------------------
+	- npm install express-handlebars //Installam handlerbars templating engine v projekt. Jade mi ni všeč.
+	- V app.js configruam. Piše v komentarjih.
+
+Gulp
+	-------------------------------------------------
+	npm install gulp --save-dev // Dev pomeni da je najnovejša verzija. Zna bit unstable. 
+	Ustvarim gulpfile.js
+	gulp <ime taska>
+	npm install gulp-sass --save-dev
+
+MongoDB
+	-------------------------------------------------
+	src: https://docs.mongodb.com/manual/tutorial/install-mongodb-on-ubuntu/
+	sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv EA312927
+	echo "deb http://repo.mongodb.org/apt/ubuntu xenial/mongodb-org/3.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.2.list (samo za ubuntu 16.04)
+	sudo apt-get update
+	sudo apt-get install -y mongodb-org
+	sudo touch /lib/systemd/system/mongod.service //nisn ziher če je dejansko treba
+	sudo service mongod start// zaj laufa v ozadju
+
+	systemctl daemon-reload// če nebo delalo
+
+
+	mongo // da se connctaš, client
+
+Mongoose
+	-------------------------------------------------
+	To je NodeJs api oz. orm za mongodb
+
+Jquery // installan je locally v projektu ker pač folk dela to po novem
+	-------------------------------------------------
+	npm install -S jquerry
+
+WebPack // gulp replacement
+	-------------------------------------------------
+	npm install -S webpack // locally installam webpack 
+	npm install -g webpack
+	touch webpack.config.js // Naredim configuration file za webpack. Podobno kot gulpfile.js
+	npm install sass-loader node-sass webpack --save-dev
+	npm install css-loader style-loader -S
+	npm install --save-dev babel-cli
+	npm install babel-loader babel-core babel-preset-es2015 --save-dev
+	npm install --save-dev babel-preset-react
+	npm install --save-dev babel-preset-stage-0
+	npm install babel-plugin-add-module-exports --save-dev
+	npm install --save-dev babel-plugin-react-html-attrs
+	npm install --save-dev babel-plugin-transform-class-properties
+	npm install --save-dev babel-plugin-transform-decorators-legacy
+
+React
+	-------------------------------------------------
+	npm --save-dev install react react-dom
