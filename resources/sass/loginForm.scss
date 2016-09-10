@@ -1,0 +1,122 @@
+@import './variables/colors';
+$verticalElementMargin: 30px;
+$white: #FFFFFF;
+
+$color: #3D3737;
+$color1: #882413;
+
+body //Če bo single page web app je treba to dat drugam
+{
+	margin: 0;
+	background-color: $bodyColor;
+	font-family: 'Montserrat', sans-serif;
+}
+
+
+.form
+{
+	font-size: 25px;//To definira velikost celega forma
+	margin: 60px auto 0 auto;
+	width: 25em;
+	background: $color;
+	padding: 1.4em;
+	border-top: 8px solid $color1;
+	border-radius: 3px;
+
+}
+
+.form > .switch > ul
+{
+	padding: 0;
+	margin: 0;
+	list-style-type: none;
+	margin: 0 0 $verticalElementMargin 0;
+}
+
+.form > .switch > ul > li
+{
+	display: inline-block;
+	width: 50%;
+	text-align: center;
+	background: lighten(desaturate(adjust-hue($color, 0.0405), 8.8525), 10.3922);
+	color: #FFFFFF;
+	padding: 7px 0 7px 0;
+	cursor: pointer;
+
+}
+
+.form > .switch > ul > li.selected
+{
+	background: $color1;
+}
+
+.form > .switch > ul > li:hover
+{
+	-webkit-transition: background 0.4s; /* Safari */
+    transition: background 0.4s;
+	background: lighten(desaturate(adjust-hue($color1, 0.0000), 13.6475), 9.6078);
+}
+
+.form > .title
+{
+	color: $white;
+	font-size: 1.5em;
+	text-align: center;
+	margin: 0 0 $verticalElementMargin 0;
+}
+
+.form .inputFields .inputField input,select
+{
+	width: calc(100% - 20px);
+	font-size: 1em;
+	padding: 10px;
+	border: 0;
+	display: block;
+}
+
+.form .inputFields .inputField input
+{
+	width: calc(100% - 20px);
+}
+
+.form .inputFields .inputField select
+{
+	width: 100%;
+}
+
+.form .inputFields .inputField select:focus, input:focus
+{
+	outline: none;
+}
+
+.form .inputFields .inputField
+{
+	margin: 0 0 $verticalElementMargin - 15px 0;
+}
+
+.form .inputFields .checkMarkContainer
+{
+	height: 100%;
+}
+
+.form > .submitButton
+{
+	width: 100%;
+	height: 2em;
+	border: none;
+	font-size: 2em;
+	padding: 0;
+	background: $color1;
+	color: #FFFFFF;
+	font-weight: 600;
+
+}
+
+.form > .submitButton:hover
+{
+	-webkit-transition: background 0.4s; /* Safari */
+    transition: background 0.4s;
+	background: lighten(desaturate(adjust-hue($color1, 0.0000), 13.6475), 9.6078);
+	cursor: pointer;
+
+}

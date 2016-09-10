@@ -1,0 +1,90 @@
+// @import './variables/colors';
+@import './variables/zIndex';
+
+$menuItemInnerHeight: 50px;
+$menuItemFontSize: $menuItemInnerHeight - 30;
+
+
+$color: #3D3737;
+$color1: #882413;
+
+.navBar
+{
+	position: fixed;
+	top: 0;
+	left: 0;
+
+	width: 100%;
+
+	z-index: $navBar_zIndex;
+}
+
+.navBar > ul
+{
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+
+	background: $color;
+}
+
+.navBar > ul > li
+{
+	padding: 0;
+	margin: 0;
+	height: $menuItemInnerHeight;
+
+	-webkit-transition: background-color .25s;
+	-moz-transition: background-color .25s;
+	-ms-transition: background-color .25s;
+	-o-transition: background-color .25s;
+	transition: background-color .25s;
+}
+
+.navBar > ul > li.floatLeft
+{
+	float: left;
+}
+
+.navBar > ul > li.floatRight
+{
+	float: right;
+}
+
+
+
+.navBar > ul > li > a
+{
+	text-align: center;
+	vertical-align: middle;
+	line-height: $menuItemInnerHeight;  
+
+	color: #FFFFFF;
+	text-decoration: none;
+
+	display: block;
+	height: 100%;
+
+	// position: relative;
+
+	font-weight: 800;
+	text-transform: uppercase;
+	font-size: 1.5rem;
+
+	padding-left: 10px;
+	padding-right: 10px;
+
+	box-sizing: border-box;
+}
+
+
+.navBar > ul > li:hover, .navBar > ul > li.selected:hover
+{
+	background-color: lighten(desaturate(adjust-hue($color1, 0.0000), 13.6475), 9.6078);
+}
+
+.navBar > ul > li.selected
+{
+	background-color: $color1;
+}

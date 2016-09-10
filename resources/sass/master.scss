@@ -1,0 +1,9 @@
+@import './variables/colors';
+
+body, html
+{
+	margin: 0;
+	font-family: 'Montserrat', sans-serif;
+	background: $bodyColor;
+	font-size: 15px;
+}

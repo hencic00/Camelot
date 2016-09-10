@@ -1,0 +1,253 @@
+@import 'barve';
+// @import './variables/colors';
+
+$menuItemInnerHeight: 23px;
+$menuItemFontSize: $menuItemInnerHeight - 2;
+$menuItemPaddingTopBottom: $menuItemInnerHeight * 0.75;
+$menuItemPaddingLeftRight: $menuItemInnerHeight * 1.25;
+
+$sideMenuWidth: 258px;
+
+
+
+.cssMenu
+{
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	z-index: 1;
+	box-sizing: border-box;
+}
+
+.content
+{
+	z-index: 0;
+	margin-top: ($menuItemPaddingTopBottom * 2) + $menuItemInnerHeight + 6px;
+	margin-left: $sideMenuWidth;
+	width: calc(100% - $sideMenuWidth);
+}
+
+.contentDisabled
+{
+	pointer-events: none;
+}
+
+.content > div
+{
+	margin: auto;
+}
+
+.cssMenu > ul
+{
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+
+	background: $primarnaBarva;
+    border-bottom: 6px $sekundarnaBarva solid;
+}
+
+.cssMenu > ul > li
+{
+	padding: 0;
+	margin: 0;
+	line-height: $menuItemInnerHeight*1.21;
+}
+
+.cssMenu > ul > li.floatLeft
+{
+	float: left;
+}
+
+.cssMenu > ul > li.floatRight
+{
+	float: right;
+}
+
+
+
+.cssMenu > ul > li > a
+{
+	color: $terciarnaBarva;
+	text-decoration: none;
+	display: block;
+	padding: $menuItemPaddingTopBottom $menuItemPaddingLeftRight;
+	height: $menuItemInnerHeight;
+	position: relative;
+	font-weight: 700;
+	text-transform: uppercase;
+	font-size: $menuItemFontSize;
+
+	-webkit-transition: color .25s;
+	-moz-transition: color .25s;
+	-ms-transition: color .25s;
+	-o-transition: color .25s;
+	transition: color .25s;
+}
+
+.cssMenu > ul > li > a:hover
+{
+	color: $sekundarnaBarva;
+}
+
+.cssMenu > ul > li.dot > a:after
+{
+	content: "";
+	display: block;
+	position: absolute;
+	right: -3px;
+	top: (($menuItemInnerHeight + ($menuItemPaddingTopBottom * 2)) - ($menuItemInnerHeight + ($menuItemPaddingTopBottom * 2)) * 0.18) / 2;
+	height: ($menuItemInnerHeight + ($menuItemPaddingTopBottom * 2)) * 0.18;
+	width: ($menuItemInnerHeight + ($menuItemPaddingTopBottom * 2)) * 0.18;
+	background: $sekundarnaBarva;
+}
+
+.cssMenu > ul > li.last.dot > a:after
+{
+	display: none;
+}
+
+.cssMenu > ul > li > a:before 
+{
+	content: "";
+	display: block;
+	position: absolute;
+	left: 0px;
+	bottom: 0;
+	height: ($menuItemInnerHeight + ($menuItemPaddingTopBottom * 2)) * 0.08;
+	width: 0;
+	background: $sekundarnaBarva;
+	-webkit-transition: width .25s;
+	-moz-transition: width .25s;
+	-ms-transition: width .25s;
+	-o-transition: width .25s;
+	transition: width .25s;
+}
+
+.cssMenu > ul > li > a:hover:before
+{
+	width: 100%;
+}
+
+.cssMenu > ul > li.selected a
+{
+	color: $sekundarnaBarva;
+}
+.cssMenu > ul > li.selected > a:before
+{
+	width: 100%;
+}
+
+
+.cssMenu > ul > .menuIcon > a > svg
+{
+	position: relative;
+	height: 40px;
+	width: 40px;
+}
+
+.cssMenu > ul > .menuIcon
+{
+	background: $terciarnaBarva;
+	display:none;
+}
+
+
+
+
+@media screen and (max-width: 700px)
+{
+	// .content
+	// {
+	// 	z-index: 0;
+	// 	// margin-top: (($menuItemPaddingTopBottom * 2) + $menuItemInnerHeight) * 4;
+	// }
+
+	// .cssMenu > ul > li
+	// {
+	// 	float: none;
+	// 	display: block;
+	// 	width: 100%;
+	// }
+	// .cssMenu ul li a
+	// {
+	// 	width: 100%;
+	// }
+
+	.cssMenu .hide
+	{
+		display: none;
+	}
+
+	.cssMenu > ul > .menuIcon
+	{
+		display: block;
+	}
+	
+}
+//Side menu code
+
+
+.sideMenu
+{
+	width: $sideMenuWidth;
+	height: 100%;
+	position: fixed;
+	left: 0;
+	top: (($menuItemPaddingTopBottom * 2) + $menuItemInnerHeight) + 6px;
+	margin: 0 0 0 0;
+	padding: 0;
+	box-sizing: border-box;
+	// yborder-right: 5px $sekundarnaBarva solid;
+	background: $primarnaBarva;
+
+	text-align: center;
+
+	// border-top: 2px #A8A8A8 solid;
+}
+
+.sideMenu > li
+{
+	color: $terciarnaBarva;
+	border-bottom: 2px #A8A8A8 solid;
+	height: 40px;
+	line-height: 40px;
+}
+
+.sideMenu > li:hover
+{
+	background: #6F6B6B;
+	cursor: pointer;
+}
+
+.sideMenu > li > ul
+{
+	list-style: none;
+	padding: 0;
+}
+
+.sideMenu > li > ul > li
+{
+	display: inline-block;
+}
+
+.sideMenu > li > ul > li:nth-child(3) > svg
+{
+	position: relative;
+	top: 9px;
+	left: 8px;
+	height: 20px;
+	width: 20px;
+}
+
+.sideMenu .online
+{
+	fill: #00A40D;
+}
+
+.sideMenu .offline
+{
+	fill: #FF0303;
+}
