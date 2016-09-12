@@ -1,12 +1,12 @@
 import React from "react";
-require("../sass/NavBar.scss");
+require("./NavBar.scss");
 
 export default class NavBar extends React.Component
 {
 
-	constructor(props)
+	constructor()
 	{
-		super(props);
+		super();
 	}
 
 	render()

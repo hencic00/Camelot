@@ -1,5 +1,5 @@
 // @import './variables/colors';
-@import './variables/zIndex';
+// @import './variables/zIndex';
 
 $menuItemInnerHeight: 50px;
 $menuItemFontSize: $menuItemInnerHeight - 30;
@@ -16,7 +16,7 @@ $color1: #882413;
 
 	width: 100%;
 
-	z-index: $navBar_zIndex;
+	z-index: 1000;
 }
 
 .NavBar > ul

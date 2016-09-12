@@ -1,13 +1,13 @@
 import React from "react";
-import NavBar from "./NavBar.js";
-import BoxList from "./BoxList.js";
+import NavBar from "./NavBar/NavBar.js";
+import BoxList from "./BoxList/BoxList.js";
 
 export default class Layout extends React.Component
 {
 
-	constructor(props)
+	constructor()
 	{
-		super(props);
+		super();
 	}
 
 	render()

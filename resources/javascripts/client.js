@@ -1,10 +1,10 @@
 import React from "react";
 import ReactDOM from "react-dom";
 
-require("../sass/master.scss");
+require("./master.scss");
 
 
-import Layout from "./Layout.js";
+import Layout from "./Layout/Layout.js";
 
 const app = document.getElementById('app');
 
