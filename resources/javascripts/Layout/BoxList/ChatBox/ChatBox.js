@@ -10,25 +10,36 @@ export default class ChatBox extends React.Component
 
 		this.state =
 		{
-			msg: ["To si res sam dzajniral? Pa ti si neverjeten Henčič!", "Jap. Skoda da nisi taki mojster ko jas..." , "Res je! Moram se še dosti naučit."]
+			msg: ["To si res sam dzajniral? Pa ti si neverjeten Henčič!", "Jap. Skoda da nisi taki mojster ko jas..." , "Res je! Moram se še dosti naučit."],
+			context: ""
 		};
+	}
+
+	handleClick(e)
+	{
+		this.props.removeChatBox(this.props.userName);
+	}
+
+	selectChatBox()
+	{
+		this.props.updateSelectedChatBox(this.props.userName);	
 	}
 
 	render()
 	{
 
 		return (
-			<div className="chat box">
+			<div className={"chat box " + this.props.context} onClick={this.selectChatBox.bind(this)}>
 				<ul>
 					<li className="title">
 						<ul>
 							<li className="name">
-								<div>{this.props.name}</div>
+								<div>{this.props.userName}</div>
 							</li>
 							<li className="alert">
 								<div>3</div>
 							</li>
-							<li className="closeIcon">
+							<li className="closeIcon" onClick={this.handleClick.bind(this)}>
 								<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" x="0px" y="0px"viewBox="0 0 28 28"  xmlSpace="preserve"> <g> <g id="x"> <g> <polygon  points="28,22.398 19.594,14 28,5.602 22.398,0 14,8.402 5.598,0 0,5.602 8.398,14 0,22.398 5.598,28 14,19.598 22.398,28 			"/> </g> </g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g> <g> </g>
 								</svg>
 							</li>
