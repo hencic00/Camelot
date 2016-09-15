@@ -1,5 +1,7 @@
 import React from "react";
-import _ from 'lodash';
+import indexOf from 'lodash/indexOf';
+import findIndex from 'lodash/findIndex';
+import map from 'lodash/map';
 
 require("./BoxList.scss");
 
@@ -15,10 +17,10 @@ export default class BoxList extends React.Component
 		super();
 		this.state = 
 		{
-			activeChats: [],
-			chatBoxCounter: 0,
 			chatList: [],
-			selectedChatBox: ""
+			chatBoxCounter: 0,
+			selectedChatBox: "",
+			isContactBoxHidden: ""
 		};
 	}
 
@@ -26,18 +28,15 @@ export default class BoxList extends React.Component
 	addChatBox(userName)
 	{
 		
-		var index = _.indexOf(this.state.activeChats, userName);
-		// var tmp = this.state.selectedChatBoxes;
-		// tmp.push("");
+		var index = findIndex(this.state.chatList, {id: userName});
+		
 		if (index == -1) 
 		{
 			this.setState
 			(
 				{
-					chatList: this.state.chatList.concat(<ChatBox removeChatBox={this.removeChatBox.bind(this)} updateSelectedChatBox={this.updateSelectedChatBox.bind(this)} context={""} key={userName} userName={userName}/>),
-					activeChats: this.state.activeChats.concat(userName),
+					chatList: this.state.chatList.concat({id: userName, isHidden: ""}),
 					chatBoxCounter: this.state.chatBoxCounter + 1
-					// selectedChatBoxes: tmp	
 				}
 			);
 		}
@@ -48,84 +47,112 @@ export default class BoxList extends React.Component
 
 	}
 
-	//.selectedChatBoxes[this.state.chatBoxCounter]
+	removeChatBox(userName)
+	{
+
+
+		var index = findIndex(this.state.chatList, {id: userName});
+
+		var chatList = this.state.chatList;
+		chatList.splice(index, 1);
+
+		if (this.state.selectedChatBox == userName) 
+		{
+			this.setState
+			(
+				{
+					chatList: chatList,
+					chatBoxCounter: this.state.chatBoxCounter - 1,
+					selectedChatBox: ""
+				}
+			);
+		}
+		else
+		{
+			this.setState
+			(
+				{
+					chatList: chatList,
+					chatBoxCounter: this.state.chatBoxCounter - 1
+				}
+			);
+		}
+	}
+
+	hideShowBox(userName)
+	{
+		var index = findIndex(this.state.chatList, {id: userName});
+		var chatList = this.state.chatList;
+
+		if (this.state.chatList[index].isHidden == "")
+		{
+			chatList[index] = {id: userName, isHidden: "hidden"};
+
+			if (this.state.selectedChatBox == userName)
+			{
+				this.setState({selectedChatBox: "", chatList: chatList});
+			}
+			else
+			{
+				this.setState({chatList: chatList});
+			}
+		}
+		else
+		{
+			chatList[index] = {id: userName, isHidden: ""};
+
+			this.setState({chatList: chatList, selectedChatBox: userName});
+		}		
+
+	}
 
 	updateSelectedChatBox(userName)
 	{
 		
-		
-		var index = _.indexOf(this.state.activeChats, userName);
-
-		console.log(this.state.selectedChatBox);
-
-		if (this.state.selectedChatBox == "")
+		if (this.state.selectedChatBox != userName)
 		{
-			var tmp = this.state.chatList;
-			tmp[index] = <ChatBox removeChatBox={this.removeChatBox.bind(this)} updateSelectedChatBox={this.updateSelectedChatBox.bind(this)} context={"selected"} key={userName} userName={userName}/>;
+			var index = findIndex(this.state.chatList, {id: userName});
 
-			this.setState
-			(
-				{
-					chatList: tmp, 
-					selectedChatBox: userName
-				}
-			);
+			this.setState({selectedChatBox: userName});
 		}
-
-		else
-		{
-			var index1 = _.indexOf(this.state.activeChats, this.state.selectedChatBox);
-
-			var tmp = this.state.chatList;
-
-			tmp[index] = <ChatBox removeChatBox={this.removeChatBox.bind(this)} updateSelectedChatBox={this.updateSelectedChatBox.bind(this)} context={"selected"} key={userName} userName={userName}/>;
-
-			tmp[index1] = <ChatBox removeChatBox={this.removeChatBox.bind(this)} updateSelectedChatBox={this.updateSelectedChatBox.bind(this)} context={""} key={this.state.selectedChatBox} userName={this.state.selectedChatBox}/>;
-
-
-
-			this.setState
-			(
-				{
-					chatList: tmp, 
-					selectedChatBox: userName
-				}
-			);
-
-		}
-
-		
 
 	}
 
-	removeChatBox(userName)
+	hideContactBox()
 	{
-		var index = _.indexOf(this.state.activeChats, userName);
-
-		var tmp = this.state.chatList;
-		tmp.splice(index, 1);
-
-		var tmp1 = this.state.activeChats;
-		tmp1.splice(index, 1);
-
-		this.setState
-		(
-			{
-				chatList: tmp,
-				activeChats: tmp1,
-				chatBoxCounter: this.state.chatBoxCounter - 1	
-			}
-		);
+		if (this.state.isContactBoxHidden == "")
+		{
+			this.setState({isContactBoxHidden: "hidden"});
+		}
+		else if (this.state.isContactBoxHidden == "hidden")
+		{
+			this.setState({isContactBoxHidden: ""});
+		}
 	}
 
 	render()
 	{
+		var nekaj = [];
+		for (var i = 0; i < this.state.chatList.length; i++)
+		{
+			if (this.state.selectedChatBox == this.state.chatList[i].id)
+			{
+				nekaj.push(<ChatBox removeMyself={this.removeChatBox.bind(this)} updateSelectedChatBox={this.updateSelectedChatBox.bind(this)} context={"selected " + this.state.chatList[i].isHidden} hideShowMyself={this.hideShowBox.bind(this)} key={this.state.chatList[i].id} userName={this.state.chatList[i].id}/>);
+			}
+			else
+			{
+				nekaj.push(<ChatBox removeMyself={this.removeChatBox.bind(this)} updateSelectedChatBox={this.updateSelectedChatBox.bind(this)} context={this.state.chatList[i].isHidden} hideShowMyself={this.hideShowBox.bind(this)} key={this.state.chatList[i].id} userName={this.state.chatList[i].id}/>);
+			}
+			
+		}
+
+
 		return (
 			<div className="boxList">
 
-				<ContactBox addChatBox={this.addChatBox.bind(this)}/>
+				<ContactBox addChatBox={this.addChatBox.bind(this)} hideMyself={this.hideContactBox.bind(this)} context={this.state.isContactBoxHidden}/>
 
-				{this.state.chatList}
+				{nekaj}
 
 			</div>
 		);

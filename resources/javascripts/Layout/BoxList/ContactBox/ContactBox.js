@@ -13,14 +13,19 @@ export default class ChatBox extends React.Component
 		this.props.addChatBox(e.target.innerHTML);
 	}
 
+	hideMyself()
+	{
+		this.props.hideMyself();
+	}
+
 	render()
 	{
 
 		return (
-			<div className="contact box">
+			<div className={"contact box " + this.props.context}>
 				<ul>
 
-					<li className="title">
+					<li className="title" onClick={this.hideMyself.bind(this)}>
 						<ul>
 							<li className="name">
 								<div>Contacts</div>

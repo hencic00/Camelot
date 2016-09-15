@@ -87,3 +87,5 @@ WebPack // gulp replacement
 React
 	-------------------------------------------------
 	npm --save-dev install react react-dom
+	npm -S install react-router
+	sudo npm install -S history@1

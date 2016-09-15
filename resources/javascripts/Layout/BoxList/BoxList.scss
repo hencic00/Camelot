@@ -82,6 +82,8 @@ $color1: #882413;
 }
 
 
+
+
 .box .content
 {
 	height: calc(100% - 5rem);
@@ -352,3 +354,20 @@ $color1: #882413;
 
 //     // margin: 2px;
 // }
+
+.hidden .content, .hidden .input
+{
+	display:none;
+}
+
+.hidden
+{
+	height: 2.5rem;
+	margin-top: 24.5rem;
+	width: 13rem;
+}
+
+.hidden .title
+{
+	height: 100%;
+}
