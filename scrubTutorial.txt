@@ -88,4 +88,9 @@ React
 	-------------------------------------------------
 	npm --save-dev install react react-dom
 	npm -S install react-router
-	sudo npm install -S history@1
+	sudo npm install -S history
+
+Auth0
+	-------------------------------------------------
+	npm install -S auth0-lock
+	npm install webpack-env-loader --save-dev
