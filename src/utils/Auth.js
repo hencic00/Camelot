@@ -1,4 +1,3 @@
-import Auth0Lock from 'auth0-lock';
 import Cookie from 'js-cookie';
 
 export default class AuthService
