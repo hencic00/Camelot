@@ -1,8 +1,8 @@
 var express = require('express');
-var mongoose = require('mongoose');
 var fs = require('fs');
+var mongoose = require('mongoose');
+var NodeRSA = require('node-rsa');
 
-var router = express.Router();
 
 //Load all files in models folder
 fs.readdirSync(__dirname + '/../models').forEach(function(filename)
@@ -10,13 +10,17 @@ fs.readdirSync(__dirname + '/../models').forEach(function(filename)
 	require(__dirname + '/../models/' + filename)
 });
 
+//RSA setup
+var keyPair = new NodeRSA({b: 512});
+var publicKey = keyPair.exportKey('public');
 
 
+var router = express.Router();
 //----------------------Normal routes-----------------------------
 
 router.get('/', function(req, res, next)
 {
-	res.render('home', {publicKey: 'ffeffeef'});
+	res.render('home', {publicKey: publicKey});
 });
 
 //----------------------------------------------------------------
