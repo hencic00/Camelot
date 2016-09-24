@@ -7,23 +7,22 @@ $white: #FFFFFF;
 $color: #3D3737;
 $color1: #882413;
 
-body //Če bo single page web app je treba to dat drugam
-{
-	margin: 0;
-	background-color: $bodyColor;
-	font-family: 'Montserrat', sans-serif;
-}
 
+#app
+{
+	padding-top: 60px;
+}
 
 .form
 {
 	font-size: 25px;//To definira velikost celega forma
-	margin: 60px auto 0 auto;
+	margin: 0 auto;
 	width: 25em;
 	background: $color;
 	padding: 1.4em;
 	border-top: 8px solid $color1;
-	border-radius: 3px;
+	border-top-left-radius: 3px;
+	border-top-right-radius: 3px;
 
 }
 
@@ -137,4 +136,17 @@ body //Če bo single page web app je treba to dat drugam
 	width: 100%;
 	height: 100%;
 	line-height: 2em;
+}
+
+.info 
+{
+	font-size: 35px;
+	width: 18.66em;
+	text-align: center;
+	margin: 0 auto 0 auto;
+	padding: 0.6em;
+	background: $color;
+	border-top: 8px solid $color1;
+	color: #FFFFFF;
+	opacity: 0;
 }

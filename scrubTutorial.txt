@@ -94,3 +94,7 @@ Auth0
 	-------------------------------------------------
 	npm install -S auth0-lock
 	npm install webpack-env-loader --save-dev
+
+mongodb-migrations
+	-------------------------------------------------
+	npm install mongodb-migrations --save

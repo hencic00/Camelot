@@ -18,7 +18,7 @@ export default class MainPage extends React.Component
 
 		return (
 			<div className='MainPage'>
-				<NavBar/>
+				<NavBar auth={this.props.route.auth}/>
 				<BoxList/>
 				<Content/>
 			</div>
