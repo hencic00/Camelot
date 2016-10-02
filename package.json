@@ -6,6 +6,7 @@
     "start": "./node_modules/.bin/nodemon ./bin/www",
     "webpack": "./node_modules/.bin/webpack",
     "webpackWatch": "./node_modules/.bin/webpack --watch",
+    "webpackProduction": "NODE_ENV=production ./node_modules/.bin/webpack",
     "mm": "./node_modules/mongodb-migrations/bin/mm"
   },
   "dependencies": {
