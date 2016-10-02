@@ -3,3 +3,21 @@
 	height: 100%;
 	width: 100%;
 }
+
+$bodyColor: #D6D6D6;
+
+body, html
+{
+	margin: 0;
+	font-family: 'Montserrat', sans-serif;
+	background: $bodyColor;
+	font-size: 15px;
+	height: 100%;
+	width: 100%;
+}
+
+#app
+{
+	height: 100%;
+	width: 100%;
+}

@@ -1,6 +1,7 @@
 import React from "react";
 import Ajax from '../utils/Ajax';
-import Auth from '../utils/Auth';
+import Cookie from 'js-cookie';
+import crypto from 'crypto-browserify';
 
 require("./loginForm.scss");
 
@@ -32,10 +33,12 @@ export default class LoginPage extends React.Component
 			button:
 			{	
 				content: "Login",
+				pressed: ""
 			}
 		};
-		this.auth = new Auth();
+		// this.auth = new Auth();
 		this.mailRegex = /^[-a-z0-9~!$%^&*_=+}{\'?]+(\.[-a-z0-9~!$%^&*_=+}{\'?]+)*@([a-z0-9_][-a-z0-9_]*(\.[-a-z0-9_]+)*\.(aero|arpa|biz|com|coop|edu|gov|info|int|mil|museum|name|net|org|pro|travel|mobi|[a-z][a-z])|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(:[0-9]{1,5})?$/i;
+		this.listenForKeyPress();
 	}
 
 	switchToSignUp()
@@ -145,16 +148,102 @@ export default class LoginPage extends React.Component
 		tick();
 	}
 
+	listenForKeyPress()
+	{
+		var html = document.querySelector("html");
+		var toti = this;
+		html.onkeydown=function(event)
+		{
+			if (event.keyCode == 13)
+			{
+				document.querySelector(".submitButton").click();
+				toti.setState(
+				{
+					button: 
+					{	
+						content: toti.state.button.content,
+						pressed: "pressed"
+					}
+				});
+			}
+		}
+		html.onkeyup=function(event)
+		{
+			toti.setState(
+			{
+				button: 
+				{
+					content: toti.state.button.content,
+					pressed: ""
+				}
+			});
+		}
+
+	}
+
 	login()
 	{
-		var inputFields = document.querySelector(".form .inputFields");
+		var toti = this;
+		var ajax = new Ajax();
 
+		var inputFields = document.querySelector(".form .inputFields");
 		var eMail = inputFields.children[0].children[0].value;
 		var passwd = inputFields.children[1].children[0].value;
 
-		this.props.route.auth.login();
+		if (eMail != "" && passwd != "")
+		{
+			if (this.mailRegex.test(eMail))
+			{
+				var key = (Math.random() + 1).toString(36).substring(1,6);
+				var json = JSON.stringify
+				(
+					{
+						eMail: eMail,
+						passwd: passwd
+					}
+				);
 
-		window.location = "/#/";
+				var cipher = crypto.createCipher('aes-256-ctr',key)
+				var crypted = cipher.update(json,'utf8','hex')
+				crypted += cipher.final('hex');
+
+				var data = "key=" + encodeURIComponent(this.props.keyPair.encrypt(key, 'base64')) + "&json=" + encodeURIComponent(crypted);
+
+				ajax.POST("/authenticate", data, function(response)
+				{
+					if (response == "false")
+					{
+						var infoBanner = document.querySelector(".info");
+						infoBanner.innerHTML = "Email or password do no match";
+						toti.fadeIn(infoBanner);
+					}
+					else
+					{
+						var decipher = crypto.createDecipher('aes-256-ctr', key);
+						var dec = decipher.update(response,'hex','utf8');
+  						dec += decipher.final('utf8');
+  						
+  						Cookie.set('eMail', eMail);
+						Cookie.set('loginHash', dec);
+
+						document.location = "/#/";
+
+					}
+				});
+			}
+			else
+			{
+				var infoBanner = document.querySelector(".info");
+				infoBanner.innerHTML = "Email is not valid";
+				this.fadeIn(infoBanner);
+			}
+		}
+		else
+		{
+			var infoBanner = document.querySelector(".info");
+			infoBanner.innerHTML = "Some fields are ampty";
+			this.fadeIn(infoBanner);
+		}
 	}
 
 	signUp()
@@ -186,7 +275,24 @@ export default class LoginPage extends React.Component
 						{
 							if (response == "false")
 							{
-								var data = "eMail=" + eMail + "&passwd=" + passwd + "&firstName=" + firstName + "&lastName=" + lastName + "&dateOfBirth=" + dateOfBirth + "&sex=" + sex;
+								var key = (Math.random() + 1).toString(36).substring(1,6);
+								var json = JSON.stringify
+								(
+									{
+										eMail: eMail,
+										passwd: passwd,
+										firstName: firstName,
+										lastName: lastName,
+										dateOfBirth: dateOfBirth,
+										sex: sex 
+									}
+								);
+
+								var cipher = crypto.createCipher('aes-256-ctr',key)
+  								var crypted = cipher.update(json,'utf8','hex')
+								crypted += cipher.final('hex');
+
+								var data = "key=" + encodeURIComponent(toti.props.keyPair.encrypt(key, 'base64')) + "&json=" + encodeURIComponent(crypted);
 
 								ajax.POST("/users", data);
 							}
@@ -262,13 +368,13 @@ export default class LoginPage extends React.Component
 
 		if (this.state.signUpSwitch == "selected" && this.state.loginSwitch == "")
 		{
-			button = <button class="submitButton" onClick={this.signUp.bind(this)}>
+			button = <button class={"submitButton " + this.state.button.pressed} onClick={this.signUp.bind(this)}>
 					{this.state.button.content}
 				</button>;
 		}
 		else if (this.state.signUpSwitch == "" && this.state.loginSwitch == "selected")
 		{
-			button = <button class="submitButton" onClick={this.login.bind(this)}>
+			button = <button class={"submitButton " + this.state.button.pressed} onClick={this.login.bind(this)}>
 					{this.state.button.content}
 				</button>;
 		}

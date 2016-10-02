@@ -10,7 +10,7 @@ var userSchema = new Schema
 		lastName: String,
 		dateOfBirth: String,
 		sex: String,
-		passHash: String
+		loginHash: String
 	}
 );
 

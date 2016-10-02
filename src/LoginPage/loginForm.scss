@@ -7,7 +7,6 @@ $white: #FFFFFF;
 $color: #3D3737;
 $color1: #882413;
 
-
 #app
 {
 	padding-top: 60px;
@@ -111,6 +110,11 @@ $color1: #882413;
 	color: #FFFFFF;
 	font-weight: 600;
 
+}
+
+.form > .submitButton.pressed
+{
+	background: lighten(desaturate(adjust-hue($color1, 0.0000), 13.6475), 9.6078);
 }
 
 .form > .submitButton:hover

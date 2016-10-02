@@ -2,6 +2,7 @@ var express = require('express');
 var fs = require('fs');
 var mongoose = require('mongoose');
 var NodeRSA = require('node-rsa');
+var crypto = require('crypto-browserify');
 
 
 //Load all files in models folder
@@ -20,12 +21,44 @@ var router = express.Router();
 
 router.get('/', function(req, res, next)
 {
-	res.render('home', {publicKey: publicKey});
+	var User = mongoose.model('users');
+
+	if (req.cookies.eMail != undefined || req.cookies.loginHash != undefined)
+	{
+
+		User.findOne({eMail: req.cookies.eMail}, function(err, user)
+		{
+			if (user != null)
+			{
+				if (user.loginHash == req.cookies.loginHash)
+				{
+					res.render('home', {publicKey: publicKey, layout: false}); // User will encode all sensitive information with this public key
+				}
+				else
+				{
+					res.redirect('/login');
+				}
+			}
+			else
+			{
+				res.redirect('/login');
+			}
+		});
+	}
+	else
+	{
+		res.redirect('/login');
+	}
+
 });
 
+router.get('/login', function(req, res, next)
+{
+	res.render('login', {publicKey: publicKey, layout: false}); // User will encode all sensitive information with this public key
+});
+
+
 //----------------------------------------------------------------
-
-
 
 
 //----------------------REST API-----------------------------
@@ -40,23 +73,32 @@ router.get('/users', function(req, res, next)
 
 router.post('/users', function(req, res)
 {
+	var key = keyPair.decrypt(decodeURIComponent(req.body.key), 'utf8');
+	var decipher = crypto.createDecipher('aes-256-ctr', key);
+	var dec = decipher.update(decodeURIComponent(req.body.json),'hex','utf8');
+  	dec += decipher.final('utf8');
+  	
+  	
+
+	var jsonData = JSON.parse(dec);
+
 	var User = mongoose.model('users');
 
 	var usr = new User
 	(
 		{
-			eMail: req.body.eMail,
-			password: req.body.passwd,
-			firstName: req.body.firstName,
-			lastName: req.body.lastName,
-			dateOfBirth: req.body.dateOfBirth,
-			sex: req.body.sex
+			eMail: jsonData.eMail,
+			password: jsonData.passwd,
+			firstName: jsonData.firstName,
+			lastName: jsonData.lastName,
+			dateOfBirth: jsonData.dateOfBirth,
+			sex: jsonData.sex,
+			loginHash: ""
 		}
 	);
 
 	usr.save();
 
-	res.send("ew2");
 });
 
 router.get('/users/:eMail', function(req, res, next)
@@ -81,6 +123,46 @@ router.get('/userMailExists/:eMail', function(req, res, next)
 		}
 		
 	});
+});
+
+router.post('/authenticate', function(req, res)
+{
+	var key = keyPair.decrypt(decodeURIComponent(req.body.key), 'utf8');
+	var decipher = crypto.createDecipher('aes-256-ctr', key);
+	var dec = decipher.update(decodeURIComponent(req.body.json),'hex','utf8');
+  	dec += decipher.final('utf8');
+
+  	var jsonData = JSON.parse(dec);
+
+	var User = mongoose.model('users');
+	User.findOne({eMail: jsonData.eMail}, function(err, user)
+	{
+		if (user != null)
+		{
+			if (user.password == jsonData.passwd)
+			{
+				var hash = Math.random().toString(36).slice(2);
+				user.loginHash = hash;
+				user.save();
+
+
+				var cipher = crypto.createCipher('aes-256-ctr',key)
+				var crypted = cipher.update(hash,'utf8','hex')
+				crypted += cipher.final('hex');
+
+				res.send(crypted);
+			}
+			else
+			{
+				res.send(false);
+			}
+		}
+		else
+		{
+			res.send(false);
+		}
+	});
+
 });
 
 

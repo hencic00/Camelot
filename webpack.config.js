@@ -8,7 +8,8 @@ module.exports =
 	devtool: debug ? "inline-sourcemap" : null,
 	entry: 
 	{
-		client: "./src/client.js"
+		clientMainPage: "./src/MainPage/client.js",
+		clientLoginPage: "./src/LoginPage/client.js"
 	},
 	output:
 	{
@@ -23,7 +24,7 @@ module.exports =
 		new webpack.optimize.OccurrenceOrderPlugin()
 	],
 	module: 
-	{
+	{	
 		loaders: 
 		[
 			{ 
@@ -39,6 +40,10 @@ module.exports =
 					presets: ['react', 'es2015', 'stage-0'],
 					plugins: ['react-html-attrs', 'transform-decorators-legacy', 'transform-class-properties'],
 				}
+			},
+			{
+				test: /\.json$/,
+				loader: "json-loader"
 			}
 		]
 	}
