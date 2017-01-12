@@ -20,7 +20,7 @@ export default class BoxList extends React.Component
 			chatList: [],
 			chatBoxCounter: 0,
 			selectedChatBox: "",
-			isContactBoxHidden: ""
+			isContactBoxHidden: "hidden"
 		};
 	}
 

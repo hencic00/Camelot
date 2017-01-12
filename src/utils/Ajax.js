@@ -22,7 +22,7 @@ export default class Ajax
 		xhttp.send(data);
 	}
 
-	GET(url, callback)
+	GET(url, callback, data)
 	{
 		var xhttp = new XMLHttpRequest();
 		if (callback != undefined)
@@ -36,7 +36,16 @@ export default class Ajax
 			};
 		}
 
-		xhttp.open('GET', url, true);
-		xhttp.send();
+
+		if (data != undefined)
+		{
+			xhttp.open('GET', url + "?" + data, true);
+			xhttp.send();
+		}
+		else
+		{
+			xhttp.open('GET', url, true);
+			xhttp.send();
+		}
 	}
 }

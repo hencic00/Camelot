@@ -13,9 +13,6 @@ var auth = new Auth("/#/", "/#/login");
 var keyPair = new NodeRSA({b: 512});
 keyPair.importKey(publicKey, 'public');
 
-
-
-
 const app = document.getElementById('app');
 
 ReactDOM.render(

@@ -1,0 +1,80 @@
+@import 'colors';
+
+$base-line-height: 50px;
+$white: lighten(desaturate(adjust-hue($color, 0.7557), 59.7814), 45.8824);
+$off-white: lighten(desaturate(adjust-hue($color, -7.9179), 42.4442), 25.0980);
+$spin-duration: 1s;
+$pulse-duration: 750ms;
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {	
+  50% { 
+    background: $white;
+  } 
+}
+
+html {
+  height: 100%;
+}
+body {
+  @extend html;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background: #333333;
+}
+
+.loading 
+{
+    position: fixed;
+
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    border-radius: 50%;
+    width: $base-line-height;
+    height: $base-line-height;
+    border: 1rem solid $off-white;
+    border-top-color: $white;
+    animation: spin $spin-duration infinite linear;
+  &--double {
+    border-style: double;
+    border-width: .9rem;
+  }
+}
+
+.loading-pulse {
+  position: relative;
+  width: ($base-line-height / 2);
+  height: $base-line-height;
+  background: $off-white;
+  animation: pulse $pulse-duration infinite;
+  animation-delay: ($pulse-duration / 3);
+  &:before, &:after {
+    content: '';
+    position: absolute;
+    display: block;
+    height: ($base-line-height / 1);
+    width: ($base-line-height / 3);
+    background: $off-white;
+    top: 50%;
+    transform: translateY(-50%);
+    animation: pulse $pulse-duration infinite;
+  }
+  &:before {
+    left: -($base-line-height / 1);
+  }
+  &:after {
+    left: ($base-line-height / 1);
+    animation-delay: ($pulse-duration / 1.5);
+  }
+}

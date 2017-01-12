@@ -6,10 +6,55 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var exphbs = require('express-handlebars');
 var mongoose = require('mongoose');
+var redis = require("redis");
+var redisClient = redis.createClient();
 
 var routes = require('./routes/index');
 
 var app = express();
+
+//Server
+var server = require('http').Server(app);
+var io = require('socket.io')(server);
+
+app.use(function(req, res, next)
+{
+	res.io = io;
+	next();
+});
+
+io.on('connection', function(client)
+{
+	// var data = cookieParser.JSONCookie(client.handshake.headers.cookie);
+	redisClient.hget('onlineUsers', client.request._query['ime'], function(err, data)
+	{
+		if (data == null)
+		{
+			redisClient.hmset("onlineUsers", client.request._query['ime'], "1");
+		}
+		else 
+		{
+			var nmOfOpenPages = parseInt(data);
+			redisClient.hmset("onlineUsers", client.request._query['ime'], ++nmOfOpenPages);
+		}
+	});
+
+	client.on('disconnect', function ()
+	{
+		redisClient.hget('onlineUsers', client.request._query['ime'], function(err, data)
+		{
+			if (data == "1")
+			{
+				redisClient.hdel("onlineUsers", client.request._query['ime']);
+			}
+			else if(data != null)
+			{
+				var nmOfOpenPages = parseInt(data);
+				redisClient.hmset("onlineUsers", client.request._query['ime'], --nmOfOpenPages);
+			}
+		});
+	});
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -26,6 +71,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 //mongoose
 mongoose.connect('mongodb://127.0.0.1:27017/Camelot');
+
+//redis
+// var client = redis.createClient();
 
 app.use('/', routes);
 
@@ -67,4 +115,4 @@ app.use(function(err, req, res, next)
 });
 
 
-module.exports = app;
+module.exports = {app: app, server: server};

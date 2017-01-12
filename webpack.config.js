@@ -46,5 +46,12 @@ module.exports =
 				loader: "json-loader"
 			}
 		]
-	}
+	},
+	sassLoader: 
+	{
+	    includePaths: 
+	    [
+	    	path.resolve(__dirname, "./src/")
+	    ]
+  }
 };

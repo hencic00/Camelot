@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<!-- saved from url=(0034)http://localhost:4000/#/?_k=ofqvli -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	    
+	    <title>Camelot</title>
+
+		<!-- Fonts -->
+		<link href="./Camelot_files/css" rel="stylesheet" type="text/css">
+		<link href="./Camelot_files/css(1)" rel="stylesheet" type="text/css">
+	<style type="text/css">.NavBar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000; }
+
+.NavBar > ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #3d3737; }
+
+.NavBar > ul > li {
+  padding: 0;
+  margin: 0;
+  height: 50px;
+  -webkit-transition: background-color .25s;
+  -moz-transition: background-color .25s;
+  -ms-transition: background-color .25s;
+  -o-transition: background-color .25s;
+  transition: background-color .25s; }
+
+.NavBar > ul > li.floatLeft {
+  float: left; }
+
+.NavBar > ul > li.floatRight {
+  float: right; }
+
+.NavBar > ul > li > a {
+  text-align: center;
+  vertical-align: middle;
+  line-height: 50px;
+  color: #FFFFFF;
+  text-decoration: none;
+  display: block;
+  height: 100%;
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 1.5rem;
+  padding-left: 10px;
+  padding-right: 10px;
+  box-sizing: border-box;
+  cursor: pointer; }
+
+.NavBar > ul > li:hover, .NavBar > ul > li.selected:hover {
+  background-color: #a53927; }
+
+.NavBar > ul > li.selected {
+  background-color: #882413; }
+</style><style type="text/css">.boxList {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  pointer-events: none; }
+
+.box {
+  display: inline-block;
+  float: right;
+  margin-right: 0.5rem;
+  box-shadow: 0 5px 8px 0 #A7A7A7;
+  background-color: #FFFFFF;
+  border-top: 0.3rem solid #882413;
+  border-radius: 4px;
+  pointer-events: auto; }
+
+.chat {
+  height: 22rem;
+  width: 19rem;
+  margin-top: 5rem; }
+
+.contact {
+  height: 27rem;
+  width: 19rem; }
+
+.box > ul {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+  float: left;
+  width: 100%;
+  height: 100%; }
+
+.box .title {
+  height: 2.5rem;
+  width: 100%;
+  border-bottom: 0.1rem solid #C6C6C6;
+  margin: 0;
+  box-sizing: border-box;
+  cursor: pointer;
+  background: #E1E1E1; }
+
+.box .title:hover {
+  background: #D9D9D9; }
+
+.selected .title {
+  background: #515151;
+  color: #FFFFFF; }
+
+.selected .title:hover {
+  background: #6b6767; }
+
+.box .content {
+  height: calc(100% - 5rem);
+  width: 100%;
+  border-bottom: 0.1rem solid #F0F0F0;
+  margin: 0;
+  box-sizing: border-box;
+  overflow-y: scroll; }
+
+.contact .content ul {
+  padding: 0;
+  list-style-type: none; }
+
+.contact .content ul li {
+  padding: 5%;
+  box-sizing: border-box;
+  border-bottom: 0.1rem solid #F0F0F0;
+  color: #686868;
+  cursor: pointer; }
+
+.contact .content ul li:hover {
+  background: #F8F8F8; }
+
+.chat .content {
+  padding: 5%; }
+
+.box .input {
+  height: 2.5rem;
+  width: 100%;
+  border-top: 0.1rem solid #F0F0F0;
+  margin: 0;
+  box-sizing: border-box; }
+
+.box .input input {
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  border: none;
+  padding: 0;
+  padding: 0.5rem 0.4rem;
+  color: #656565; }
+
+.box .input input:focus {
+  outline: none; }
+
+.box .title > ul {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+  float: left;
+  height: 100%;
+  width: 100%; }
+
+.box .title > ul > li {
+  height: 100%;
+  display: inline-flex;
+  align-items: center; }
+
+.box .title .name div {
+  margin-left: 0.7rem;
+  font-size: 1.2rem; }
+
+.box .title .alert div {
+  margin-left: 0.2rem;
+  font-size: 0.9rem;
+  background: #882413;
+  color: #FFFFFF;
+  border-radius: 25px;
+  padding: 0.17rem 0.45rem 0.17rem 0.45rem;
+  position: relative;
+  bottom: 0.11em;
+  font-weight: bold; }
+
+.box .title .closeIcon {
+  float: right;
+  padding-right: 0.3rem; }
+
+.box .title .closeIcon > svg {
+  fill: #9A9898;
+  width: 0.7rem;
+  height: 0.7rem;
+  padding: 0.35rem; }
+
+.box .title .closeIcon > svg:hover {
+  fill: #414141;
+  width: 0.7rem;
+  height: 0.7rem; }
+
+.msg {
+  margin-bottom: 3%; }
+
+.msg > ul {
+  list-style-type: none;
+  padding: 0; }
+
+.msg .topLevel > ul {
+  list-style-type: none;
+  padding: 0;
+  overflow: hidden; }
+
+.msg .topLevel > ul > li {
+  display: inline-block; }
+
+.msg .topLevel li {
+  font-size: 0.75rem; }
+
+.msg .time {
+  color: #7F7F7F; }
+
+.msg .senderName {
+  font-weight: 600; }
+
+.sent .senderName {
+  float: right; }
+
+.sent .time {
+  float: left; }
+
+.received .senderName {
+  float: left; }
+
+.received .time {
+  float: right; }
+
+.msg .bottomLevel {
+  margin-top: 3%; }
+
+.msg .bottomLevel ul {
+  padding: 0;
+  list-style-type: none;
+  overflow: hidden; }
+
+.msg .bottomLevel ul > li {
+  display: inline-block; }
+
+.sent .bottomLevel .senderPic {
+  float: right;
+  width: 23%; }
+
+.sent .bottomLevel .msgContent {
+  float: left;
+  width: 66%;
+  margin: 4% 5% 2% 2%;
+  background: #882413;
+  color: #E6E2E2; }
+
+.received .bottomLevel .senderPic {
+  float: left;
+  width: 23%; }
+
+.received .bottomLevel .msgContent {
+  float: right;
+  width: 66%;
+  margin: 4% 2% 2% 5%;
+  background: #b8b8b8; }
+
+.msg .bottomLevel .msgContent {
+  font-size: 0.9rem;
+  padding: 2%; }
+
+.msg .bottomLevel .senderPic img {
+  height: 100%;
+  width: 100%;
+  border-radius: 50%; }
+
+.hidden .content, .hidden .input {
+  display: none; }
+
+.hidden {
+  height: 2.5rem;
+  margin-top: 24.5rem;
+  width: 13rem; }
+
+.hidden .title {
+  height: 100%; }
+</style><style type="text/css">@keyframes spin {
+  0% {
+    transform: rotate(0deg); }
+  100% {
+    transform: rotate(360deg); } }
+
+@keyframes pulse {
+  50% {
+    background: #ccbcb9; } }
+
+html, body {
+  height: 100%; }
+
+body {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background: #333333; }
+
+.loading {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  border: 1rem solid #b36968;
+  border-top-color: #ccbcb9;
+  animation: spin 1s infinite linear; }
+  .loading--double {
+    border-style: double;
+    border-width: .9rem; }
+
+.loading-pulse {
+  position: relative;
+  width: 25px;
+  height: 50px;
+  background: #b36968;
+  animation: pulse 750ms infinite;
+  animation-delay: 250ms; }
+  .loading-pulse:before, .loading-pulse:after {
+    content: '';
+    position: absolute;
+    display: block;
+    height: 50px;
+    width: 16.66667px;
+    background: #b36968;
+    top: 50%;
+    transform: translateY(-50%);
+    animation: pulse 750ms infinite; }
+  .loading-pulse:before {
+    left: -50px; }
+  .loading-pulse:after {
+    left: 50px;
+    animation-delay: 500ms; }
+</style><style type="text/css">.GameWindow {
+  height: 100%;
+  width: 100%; }
+
+@keyframes fadeIn {
+  to {
+    opacity: 1; } }
+
+.GameWindow canvas {
+  opacity: 0;
+  animation: fadeIn .2s ease-in 1 forwards; }
+
+.isPaused canvas {
+  animation-play-state: paused; }
+</style><style type="text/css">.Content {
+  padding-top: 50px;
+  height: calc(100% - 50px);
+  width: 100%; }
+
+.Content .GameWindowContainer {
+  padding: 20px;
+  height: calc(100% - 40px);
+  width: calc(100% - 40px); }
+</style><style type="text/css">.MainPage {
+  height: 100%;
+  width: 100%; }
+
+body, html {
+  margin: 0;
+  font-family: 'Montserrat', sans-serif;
+  background: #D6D6D6;
+  font-size: 15px;
+  height: 100%;
+  width: 100%; }
+
+#app {
+  height: 100%;
+  width: 100%; }
+</style></head>
+	<body>
+
+	    <div id="app"><div data-reactroot="" class="MainPage"><div class="Content"><button type="button">Click Me!</button></div><div class="NavBar"><ul><li class="floatLeft dot selected"><a href="http://localhost:4000/">Home</a></li><li class="floatLeft dot"><a href="http://localhost:4000/">Chat</a></li><li class="floatLeft dot"><a href="http://localhost:4000/">Leaderboard</a></li><li class="floatLeft"><a href="http://localhost:4000/">Play</a></li><li class="floatRight"><a>Logout</a></li><li class="floatRight dot"><a href="http://localhost:4000/">Profile</a></li></ul></div><div class="boxList"><div class="contact box hidden"><ul><li class="title"><ul><li class="name"><div>Contacts</div></li></ul></li><li class="content"><ul><li>Jan Henčič</li><li>Jan Jurman</li><li>Damjan Novarlić</li></ul></li><li class="input"><input type="text" placeholder="Search contacts"></li></ul></div></div></div></div>
+
+		<script type="text/javascript">
+			var publicKey = `-----BEGIN PUBLIC KEY-----
+MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAOPNfHGXljhg67tNOd89P2wOFtTBO7QD
+4ydUeU8tH1ZfSg018cpyuOjzK78Z4HPm4g9OnYdpZQwm46McilbmpT8CAwEAAQ==
+-----END PUBLIC KEY-----`;
+		</script>   
+		<script type="text/javascript" src="./Camelot_files/clientMainPage.entry.js"></script>
+	
+</body><script id="pb_blockScript">function inject() {
+		var originalOpenWndFnKey = "originalOpenFunction";
+		var originalWindowOpenFn = window.open;
+		var originalCreateElementFn = document.createElement;
+		var originalCreateEventFn = document.createEvent;
+		var windowsWithNames = {};
+		var timeSinceCreateAElement = 0;
+		var lastCreatedAElement = null;
+		var fullScreenOpenTime = void 0;
+		var parentOrigin = window.location != window.parent.location ? document.referrer : document.location;
+
+		window[originalOpenWndFnKey] = window.open; // save the original open window as global param
+		function newWindowOpenFn() {
+			var openWndArguments = arguments;
+			var useOriginalOpenWnd = true;
+			var generatedWindow = null;
+
+			function blockedWndNotification(openWndArguments) {
+				parent.postMessage({ type: "blockedWindow", args: JSON.stringify(openWndArguments) }, parentOrigin);
+			}
+
+			function getWindowName(openWndArguments) {
+				var windowName = openWndArguments[1];
+				if (windowName != null && !["_blank", "_parent", "_self", "_top"].includes(windowName)) {
+					return windowName;
+				}
+
+				return null;
+			}
+
+			function copyMissingProperties(src, dest) {
+				var prop = void 0;
+				for (prop in src) {
+					try {
+						if (dest[prop] === undefined && src[prop]) {
+							dest[prop] = src[prop];
+						}
+					} catch (e) {}
+				}
+				return dest;
+			}
+
+			// the element who registered to the event
+			var capturingElement = null;
+			if (window.event != null) {
+				capturingElement = window.event.currentTarget;
+			}
+
+			if (capturingElement == null) {
+				var caller = openWndArguments.callee;
+				while (caller.arguments != null && caller.arguments.callee.caller != null) {
+					caller = caller.arguments.callee.caller;
+				}
+				if (caller.arguments != null && caller.arguments.length > 0 && caller.arguments[0].currentTarget != null) {
+					capturingElement = caller.arguments[0].currentTarget;
+				}
+			}
+
+			/////////////////////////////////////////////////////////////////////////////////
+			// Blocked if a click on background element occurred (<body> or document)
+			/////////////////////////////////////////////////////////////////////////////////
+
+			if (capturingElement != null && (capturingElement instanceof Window || capturingElement === document || capturingElement.URL != null && capturingElement.body != null || capturingElement.nodeName != null && (capturingElement.nodeName.toLowerCase() == "body" || capturingElement.nodeName.toLowerCase() == "#document"))) {
+				window.pbreason = "Blocked a new window opened with URL: " + openWndArguments[0] + " because it was triggered by the " + capturingElement.nodeName + " element";
+				useOriginalOpenWnd = false;
+			} else {
+				useOriginalOpenWnd = true;
+			}
+			/////////////////////////////////////////////////////////////////////////////////
+
+
+			/////////////////////////////////////////////////////////////////////////////////
+			// Block if a full screen was just initiated while opening this url.
+			/////////////////////////////////////////////////////////////////////////////////
+
+			var fullScreenElement = document.webkitFullscreenElement || document.mozFullscreenElement || document.fullscreenElement;
+			if (new Date().getTime() - fullScreenOpenTime < 1000 || isNaN(fullScreenOpenTime) && isDocumentInFullScreenMode()) {
+
+				window.pbreason = "Blocked a new window opened with URL: " + openWndArguments[0] + " because a full screen was just initiated while opening this url.";
+
+				/* JRA REMOVED
+	    if (window[script_params.fullScreenFnKey]) {
+	    window.clearTimeout(window[script_params.fullScreenFnKey]);
+	    }
+	    */
+
+				if (document.exitFullscreen) {
+					document.exitFullscreen();
+				} else if (document.mozCancelFullScreen) {
+					document.mozCancelFullScreen();
+				} else if (document.webkitCancelFullScreen) {
+					document.webkitCancelFullScreen();
+				}
+
+				useOriginalOpenWnd = false;
+			}
+			/////////////////////////////////////////////////////////////////////////////////
+
+
+			if (useOriginalOpenWnd == true) {
+				generatedWindow = originalWindowOpenFn.apply(this, openWndArguments);
+				// save the window by name, for latter use.
+				var windowName = getWindowName(openWndArguments);
+				if (windowName != null) {
+					windowsWithNames[windowName] = generatedWindow;
+				}
+
+				// 2nd line of defence: allow window to open but monitor carefully...
+
+				/////////////////////////////////////////////////////////////////////////////////
+				// Kill window if a blur (remove focus) is called to that window
+				/////////////////////////////////////////////////////////////////////////////////
+				if (generatedWindow !== window) {
+					(function () {
+						var openTime = new Date().getTime();
+						var originalWndBlurFn = generatedWindow.blur;
+						generatedWindow.blur = function () {
+							if (new Date().getTime() - openTime < 1000 /* one second */) {
+									window.pbreason = "Blocked a new window opened with URL: " + openWndArguments[0] + " because a it was blured";
+									generatedWindow.close();
+									blockedWndNotification(openWndArguments);
+								} else {
+								originalWndBlurFn();
+							}
+						};
+					})();
+				}
+				/////////////////////////////////////////////////////////////////////////////////
+			} else {
+				var windowName;
+
+				(function () {
+					// (useOriginalOpenWnd == false)
+
+					var location = {
+						href: openWndArguments[0]
+					};
+					location.replace = function (url) {
+						location.href = url;
+					};
+
+					generatedWindow = {
+						close: function close() {
+							return true;
+						},
+						test: function test() {
+							return true;
+						},
+						blur: function blur() {
+							return true;
+						},
+						focus: function focus() {
+							return true;
+						},
+						showModelessDialog: function showModelessDialog() {
+							return true;
+						},
+						showModalDialog: function showModalDialog() {
+							return true;
+						},
+						prompt: function prompt() {
+							return true;
+						},
+						confirm: function confirm() {
+							return true;
+						},
+						alert: function alert() {
+							return true;
+						},
+						moveTo: function moveTo() {
+							return true;
+						},
+						moveBy: function moveBy() {
+							return true;
+						},
+						resizeTo: function resizeTo() {
+							return true;
+						},
+						resizeBy: function resizeBy() {
+							return true;
+						},
+						scrollBy: function scrollBy() {
+							return true;
+						},
+						scrollTo: function scrollTo() {
+							return true;
+						},
+						getSelection: function getSelection() {
+							return true;
+						},
+						onunload: function onunload() {
+							return true;
+						},
+						print: function print() {
+							return true;
+						},
+						open: function open() {
+							return this;
+						},
+
+						opener: window,
+						closed: false,
+						innerHeight: 480,
+						innerWidth: 640,
+						name: openWndArguments[1],
+						location: location,
+						document: { location: location }
+					};
+
+					copyMissingProperties(window, generatedWindow);
+
+					generatedWindow.window = generatedWindow;
+
+					windowName = getWindowName(openWndArguments);
+
+					if (windowName != null) {
+						try {
+							// originalWindowOpenFn("", windowName).close();
+							windowsWithNames[windowName].close();
+						} catch (err) {}
+					}
+					//why set timeout?
+					setTimeout(function () {
+						var url = void 0;
+						if (!(generatedWindow.location instanceof Object)) {
+							url = generatedWindow.location;
+						} else if (!(generatedWindow.document.location instanceof Object)) {
+							url = generatedWindow.document.location;
+						} else if (location.href != null) {
+							url = location.href;
+						} else {
+							url = openWndArguments[0];
+						}
+						openWndArguments[0] = url;
+						blockedWndNotification(openWndArguments);
+					}, 100);
+				})();
+			}
+
+			return generatedWindow;
+		}
+
+		/////////////////////////////////////////////////////////////////////////////////
+		// Replace the window open method with Poper Blocker's
+		/////////////////////////////////////////////////////////////////////////////////
+		window.open = function () {
+			try {
+				return newWindowOpenFn.apply(this, arguments);
+			} catch (err) {
+				return null;
+			}
+		};
+		/////////////////////////////////////////////////////////////////////////////////
+
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// Monitor dynamic html element creation to prevent generating <a> elements with click dispatching event
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////
+		document.createElement = function () {
+
+			var newElement = originalCreateElementFn.apply(document, arguments);
+
+			if (arguments[0] == "a" || arguments[0] == "A") {
+				(function () {
+
+					timeSinceCreateAElement = new Date().getTime();
+
+					var originalDispatchEventFn = newElement.dispatchEvent;
+
+					newElement.dispatchEvent = function (event) {
+						if (event.type != null && ("" + event.type).toLocaleLowerCase() == "click") {
+							window.pbreason = "blocked due to an explicit dispatchEvent event with type 'click' on an 'a' tag";
+							parent.postMessage({
+								type: "blockedWindow",
+								args: JSON.stringify({ "0": newElement.href })
+							}, parentOrigin);
+							return true;
+						}
+
+						return originalDispatchEventFn(event);
+					};
+
+					lastCreatedAElement = newElement;
+				})();
+			}
+
+			return newElement;
+		};
+		/////////////////////////////////////////////////////////////////////////////////
+
+
+		/////////////////////////////////////////////////////////////////////////////////
+		// Block artificial mouse click on frashly created <a> elements
+		/////////////////////////////////////////////////////////////////////////////////
+		document.createEvent = function () {
+			try {
+				if (arguments[0].toLowerCase().includes("mouse") && new Date().getTime() - timeSinceCreateAElement <= 50) {
+					window.pbreason = "Blocked because 'a' element was recently created and " + arguments[0] + " event was created shortly after";
+					arguments[0] = lastCreatedAElement.href;
+					parent.postMessage({
+						type: "blockedWindow",
+						args: JSON.stringify({ "0": lastCreatedAElement.href })
+					}, parentOrigin);
+					return null;
+				}
+				return originalCreateEventFn.apply(document, arguments);
+			} catch (err) {}
+		};
+		/////////////////////////////////////////////////////////////////////////////////
+
+
+		/////////////////////////////////////////////////////////////////////////////////
+		// Monitor full screen requests
+		/////////////////////////////////////////////////////////////////////////////////
+		function onFullScreen(isInFullScreenMode) {
+			if (isInFullScreenMode) {
+				fullScreenOpenTime = new Date().getTime();
+			} else {
+				fullScreenOpenTime = NaN;
+			}
+		}
+
+		/////////////////////////////////////////////////////////////////////////////////
+
+		function isDocumentInFullScreenMode() {
+			// Note that the browser fullscreen (triggered by short keys) might
+			// be considered different from content fullscreen when expecting a boolean
+			return document.fullScreenElement && document.fullScreenElement !== null || // alternative standard methods
+			document.mozFullscreenElement != null || document.webkitFullscreenElement != null; // current working methods
+		}
+
+		document.addEventListener("fullscreenchange", function () {
+			onFullScreen(document.fullscreen);
+		}, false);
+
+		document.addEventListener("mozfullscreenchange", function () {
+			onFullScreen(document.mozFullScreen);
+		}, false);
+
+		document.addEventListener("webkitfullscreenchange", function () {
+			onFullScreen(document.webkitIsFullScreen);
+		}, false);
+	}</script><script>inject()</script></html>

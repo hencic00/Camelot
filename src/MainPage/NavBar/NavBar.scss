@@ -1,12 +1,9 @@
-// @import './variables/colors';
-// @import './variables/zIndex';
+@import 'colors';
 
 $menuItemInnerHeight: 50px;
 $menuItemFontSize: $menuItemInnerHeight - 30;
 
-
-$color: #3D3737;
-$color1: #882413;
+$color1: darken(desaturate(adjust-hue($color, -8.7179), 70.3115), 7.6471);
 
 .NavBar
 {
@@ -26,7 +23,7 @@ $color1: #882413;
 	padding: 0;
 	overflow: hidden;
 
-	background: $color;
+	background: $color1;
 }
 
 .NavBar > ul > li
@@ -83,10 +80,10 @@ $color1: #882413;
 
 .NavBar > ul > li:hover, .NavBar > ul > li.selected:hover
 {
-	background-color: lighten(desaturate(adjust-hue($color1, 0.0000), 13.6475), 9.6078);
+	background-color: lighten(desaturate(adjust-hue($color, 0.0000), 13.6475), 9.6078);
 }
 
 .NavBar > ul > li.selected
 {
-	background-color: $color1;
+	background-color: $color;
 }
