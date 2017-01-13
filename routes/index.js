@@ -249,7 +249,7 @@ router.get('/possibleMoves', function(req, res, next)
 
 	// console.log(data.hjn);
 
-	var premiki = validate.mozniPremikiAI(gameBoard, data.pos, data.castle, prevFig, prevMove, castleMoves);
+	var premiki = validate.mozniPremikiAI(gameBoard, data.pos, data.castle, data.prevFig, data.prevMove, data.castleMoves);
 	res.send(JSON.stringify(premiki));
 	// console.log(premiki);
 	// res.send(req.query.json);
@@ -264,16 +264,82 @@ router.get('/Ples', function(req, res, next)
 	
 });
 
+router.get('/validate', function(req, res)
+{
+	var data = JSON.parse(req.query.data);
+	
+
+	var gameState = {val: toGameState(data.hjn)};
+
+	var premik = (data.src.y + 1) + ',' + (data.src.x + 1) + '>' + (data.dest.y + 1) + ',' + (data.dest.x + 1);
+	console.log(premik);
+	var prevMove = {val: null}; 
+	var prevFig = {val: null};
+	var details = {val: ""};
+	var castleMoves = {val: 0};
+
+
+	var result = validate.validiraj(premik, gameState, prevMove, prevFig, data.castle, details, castleMoves);
+	var send = null;
+
+
+	if (result)
+	{
+		send = 
+		{
+			status: true,
+			prevMove: prevMove,
+			prevFig: prevFig,
+			details: details,
+			castleMoves: castleMoves
+		};
+	}
+	else
+	{
+		send = 
+		{
+			status: false,
+			prevMove: null,
+			prevFig: null,
+			details: null,
+			castleMoves: null
+		};
+	}
+
+	// console.log(data.castle);
+
+	res.send(send);
+
+});
+
 router.post('/iMoovedMyPiece', function(req, res)
 {
 	var data = JSON.parse(req.body.data);
-	res.send("Forwarded");
+	
+
 	client.hget("enemies", data.myName, function (err, obj)
 	{
 		res.io.emit(obj, {action: 'moviePiece', src: data.src, dest: data.dest});
 	});
 
+	res.send("Forwarded");
+
 });
+
+router.post('/endTurn', function(req, res)
+{
+	var data = JSON.parse(req.body.data);
+	
+
+	client.hget("enemies", data.myName, function (err, obj)
+	{
+		res.io.emit(obj, {action: 'startTurn'});
+	});
+
+	res.send("Forwarded");
+
+});
+
 
 router.post('/lookingForGame', function(req, res)
 {
@@ -287,16 +353,18 @@ router.post('/lookingForGame', function(req, res)
 			{
 				client.rpop('lookingForGame', function (err, user1)
 				{
-					res.io.emit(user, {action:'startGame', team: '+'});
-					res.io.emit(user1, {action:'startGame', team: '-'});
+					res.io.emit(user, {action:'startGame', team: '+', yourTurn: true});
+					res.io.emit(user1, {action:'startGame', team: '-', yourTurn: false});
 
 					client.hmset("enemies", user, user1);
 					client.hmset("enemies", user1, user);
+					res.send('found');
 				});
 			});
 			
     	} 
 	});
+
 
 });
 

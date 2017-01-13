@@ -55,6 +55,16 @@ export default class GameWindow extends React.Component
 		this.pieceHovered = false;
 
 		this.loadedStuff = 0;
+
+		this.prevMove = {val: null}; 
+		this.prevFig = {val: null};
+		this.details = {val: ""};
+		this.castleMoves = {val: 0};
+
+		// this.prevMove = {val: 'MOVE'}; 
+		// this.prevFig = {val: '5,7'};
+		// this.details = {val: "wkokdwkpddkopwdkop"};
+		// this.castleMoves = {val: 0};
 	}
 
 	componentDidMount()
@@ -64,6 +74,9 @@ export default class GameWindow extends React.Component
 
 		this.listenOnSocket();
 		window.addEventListener("resize", this.resize.bind(this));
+
+		document.querySelector('.switch').addEventListener('mouseup', this.endTurn.bind(this));
+		
 
 		var toti = this;
 		
@@ -77,7 +90,7 @@ export default class GameWindow extends React.Component
 		this.camera = new THREE.PerspectiveCamera
 		(
 			45, //View angle
-			this.refs.GameWindow.offsetWidth / this.refs.GameWindow.offsetHeight, //Aspect ratio
+			this.refs.GameWindow.offsetWidth / (this.refs.GameWindow.offsetHeight), //Aspect ratio
 			0.1, //Near
 			10000 //Far
 		);
@@ -237,9 +250,55 @@ export default class GameWindow extends React.Component
 
 	resize()
 	{
-		this.camera.aspect = this.refs.GameWindow.offsetWidth / this.refs.GameWindow.offsetHeight;
+		this.camera.aspect = this.refs.GameWindow.offsetWidth / (this.refs.GameWindow.offsetHeight);
 		this.camera.updateProjectionMatrix();
-		this.renderer.setSize( this.refs.GameWindow.offsetWidth, this.refs.GameWindow.offsetHeights );
+		this.renderer.setSize( this.refs.GameWindow.offsetWidth, this.refs.GameWindow.offsetHeight);
+	}
+
+	endTurn()
+	{
+		// console.log(this.myTurn);
+		if (this.myTurn == true)
+		{
+
+			console.log('END TURN');
+
+			var ajax = new Ajax();
+
+			var data = {myName: Cookie.get('eMail')};
+			data = "data=" + encodeURIComponent(JSON.stringify(data));
+
+			
+			ajax.POST("/endTurn", data, function(response)
+			{
+				console.log(response);
+
+			});
+
+
+			// if (document.querySelector('.switch > input').checked == true)
+			// {
+				
+			// 	document.querySelector('.switch > input').checked = false;
+			// }
+			// else if (document.querySelector('.switch > input').checked == false)
+			// {
+			// 	document.querySelector('.switch > input').checked = true;
+			// }
+
+			this.myTurn = false;
+			document.querySelector('.switch').style.pointerEvents = "none";
+
+
+			this.prevMove = {val: null}; 
+			this.prevFig = {val: null};
+			this.details = {val: ""};
+			this.castleMoves = {val: 0};
+
+			// console.log(document.querySelector('.switch > input').checked);
+
+		}
+
 	}
 
 	getSelectedPiecePosition()
@@ -358,7 +417,7 @@ export default class GameWindow extends React.Component
 
 		var hjn = this.gameStateToHJN(this.gameState1);
 
-		var data = {pos: y + "," + x, castle: this.gameInfo.player, hjn: hjn};
+		var data = {pos: y + "," + x, castle: this.gameInfo.player, hjn: hjn, prevMove: this.prevMove, prevFig: this.prevFig, details: this.details, castleMoves: this.castleMoves};
 		data = encodeURIComponent(JSON.stringify(data));
 		data = "json=" + data;
 		// console.log(data);
@@ -371,17 +430,20 @@ export default class GameWindow extends React.Component
 			console.log(mozniPremiki);
 
 			// console.log(toti.scene.children[4].children[0]);
-			for (var i = 0; i < mozniPremiki.length; i++) 
+			if (mozniPremiki != null)
 			{
-				// toti.scene.children[4].children[0].children[pot[mozniPremiki[i].row - 1][mozniPremiki[i].col - 1]].isSelectable = true;
-				// toti.scene.children[4].children[0].children[pot[mozniPremiki[i].row - 1][mozniPremiki[i].col - 1]].isHoverable = true;
+				for (var i = 0; i < mozniPremiki.length; i++) 
+				{
+					// toti.scene.children[4].children[0].children[pot[mozniPremiki[i].row - 1][mozniPremiki[i].col - 1]].isSelectable = true;
+					// toti.scene.children[4].children[0].children[pot[mozniPremiki[i].row - 1][mozniPremiki[i].col - 1]].isHoverable = true;
 
-				// toti.hardSelect(toti.scene.children[4].children[0].children[pot[mozniPremiki[i].row - 1][mozniPremiki[i].col - 1]]);
-				
-				tiles.push(toti.scene.children[4].children[0].children[pot[mozniPremiki[i].row - 1][mozniPremiki[i].col - 1]]);	
+					// toti.hardSelect(toti.scene.children[4].children[0].children[pot[mozniPremiki[i].row - 1][mozniPremiki[i].col - 1]]);
+					
+					tiles.push(toti.scene.children[4].children[0].children[pot[mozniPremiki[i].row - 1][mozniPremiki[i].col - 1]]);	
 
+				}
+				callback(tiles);
 			}
-			callback(tiles);
 
 			
 		},data);
@@ -625,6 +687,21 @@ export default class GameWindow extends React.Component
 				toti.enemyIsReady = true;
 				toti.gameInfo.player = data.team;
 				toti.loadedStuff++;
+				
+				if (data.yourTurn == true)
+				{
+					document.querySelector('.switch > input').checked = true;
+					toti.myTurn = true;
+					console.log(data.yourTurn);
+				}
+				else
+				{
+					document.querySelector('.switch').checked = false;
+					toti.myTurn = false;
+					document.querySelector('.switch').style.pointerEvents = "none";
+					console.log(data.yourTurn);
+				}
+
 				toti.allObjectsAreLoaded();
 			}
 			else if (data.action == 'moviePiece')
@@ -632,6 +709,16 @@ export default class GameWindow extends React.Component
 
 				console.log("Enemy je premakno figuro");
 				toti.movePieceAtIndex(data.src.x, data.src.y, data.dest.x, data.dest.y);
+			}
+			else if (data.action == 'startTurn')
+			{
+				if (toti.myTurn == false)
+				{
+					document.querySelector('.switch > input').checked = true;
+					document.querySelector('.switch').style.pointerEvents = "auto";
+					toti.myTurn = true;
+					
+				}
 			}
 		});
 	}
@@ -641,6 +728,7 @@ export default class GameWindow extends React.Component
 	{
 		this.refs.GameWindow.children[0].style.display = "none";
 		this.refs.GameWindow.classList.remove("isPaused");
+		document.querySelector('.switch label').style.display = 'block';
 
 		requestAnimationFrame(this.update.bind(this));
 	}
@@ -760,7 +848,7 @@ export default class GameWindow extends React.Component
 		}
 
 		this.mouse.x = ( (e.pageX - this.refs.GameWindow.offsetLeft)/ this.refs.GameWindow.offsetWidth ) * 2 - 1;
-		this.mouse.y = -( (e.pageY - this.refs.GameWindow.offsetTop) / this.refs.GameWindow.offsetHeight ) * 2 + 1;
+		this.mouse.y = -( (e.pageY - this.refs.GameWindow.offsetTop) / (this.refs.GameWindow.offsetHeight) ) * 2 + 1;
 
 		// console.log(this.mouse.x);
 		// console.log(this.mouse.y);
@@ -946,7 +1034,7 @@ export default class GameWindow extends React.Component
 			document.body.style.cursor = "auto";
 
 		}
-		else if(this.gameInfo.canSelect == true)
+		else if(this.gameInfo.canSelect == true && this.myTurn == true)
 		{
 			this.rayCaster.setFromCamera( this.mouse, this.camera );
 			var intersects = this.rayCaster.intersectObjects( this.scene.children[4].children, true);
@@ -1044,16 +1132,47 @@ export default class GameWindow extends React.Component
 							this.makeHoverableAndClickable("teamA");
 							var pos = this.getPiecePosition(intersects[0].object);
 							var pos1 = this.getSelectedPiecePosition();
+							var ajax = new Ajax();
+
+
+							var hjn = this.gameStateToHJN(this.gameState1);
+
+
+							// var prevMove = {val: null}; 
+							// var prevFig = {val: null};
+							// var details = {val: ""};
+							// var castleMoves = {val: 0};
+
+
+							var data = {myName: Cookie.get('eMail'), src: {x: pos1.x, y: pos1.y}, dest: {x: pos.x, y: pos.y}, hjn: hjn, castle: this.gameInfo.player, prevMove: this.prevMove, prevFig: this.prevFig, details: this.details, castleMoves: this.castleMoves};
+							data = "data=" + encodeURIComponent(JSON.stringify(data));
+
+							var toti = this;
+							ajax.GET("/validate", function(response)
+							{
+								// console.log(response);
+								var returnedData = JSON.parse(response);
+
+								toti.prevMove.val = returnedData.prevMove.val,
+								toti.prevFig.val = returnedData.prevFig.val,
+								toti.details.val = returnedData.details.val,
+								toti.castleMoves.val = returnedData.castleMoves.val
+
+								console.log(toti.details.val);
+							}, data);
+
+
 							this.moveSelectedPiece(pos.x, pos.y);
 
 
 							var data = {myName: Cookie.get('eMail'), src: {x: pos1.x, y: pos1.y}, dest: {x: pos.x, y: pos.y}};
 							data = "data=" + encodeURIComponent(JSON.stringify(data));
 
-							var ajax = new Ajax();
+							
 							ajax.POST("/iMoovedMyPiece", data, function(response)
 							{
 								console.log(response);
+
 							});
 
 							
@@ -1094,9 +1213,9 @@ export default class GameWindow extends React.Component
 	{
 
 		return(
-			<div className='GameWindow isPaused' ref='GameWindow' onMouseUp={this.gameWindowMouseUp.bind(this)} onMouseDown={this.gameWindowMouseDown.bind(this)} onMouseMove={this.trackMouseMovements.bind(this)}>
-				<Loader ref='Loader'/>
-			</div>
+				<div className='GameWindow isPaused' ref='GameWindow' onMouseUp={this.gameWindowMouseUp.bind(this)} onMouseDown={this.gameWindowMouseDown.bind(this)} onMouseMove={this.trackMouseMovements.bind(this)}>
+					<Loader ref='Loader'/>
+				</div>
 		);
 	}
 }
