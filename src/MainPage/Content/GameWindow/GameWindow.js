@@ -4,6 +4,7 @@ import Cookie from 'js-cookie';
 
 
 var THREE = require("three");
+var OrbitControls = require('three-orbit-controls')(THREE);
 
 require("./GameWindow.scss");
 import Loader from "./Loader/Loader.js";
@@ -60,6 +61,7 @@ export default class GameWindow extends React.Component
 		this.prevFig = {val: null};
 		this.details = {val: ""};
 		this.castleMoves = {val: 0};
+		this.kje = {val: null};
 
 		// this.prevMove = {val: 'MOVE'}; 
 		// this.prevFig = {val: '5,7'};
@@ -72,11 +74,17 @@ export default class GameWindow extends React.Component
 		this.isReady = false;
 		this.enemyIsReady = false;
 
+		this.ples = 0;
+		this.ples1 = 0;
+		this.ples2 = 0;
+
 		this.listenOnSocket();
 		window.addEventListener("resize", this.resize.bind(this));
 
 		document.querySelector('.switch').addEventListener('mouseup', this.endTurn.bind(this));
-		
+
+
+		this.vse = new THREE.Group();
 
 		var toti = this;
 		
@@ -87,6 +95,11 @@ export default class GameWindow extends React.Component
 		this.renderer.setSize(this.refs.GameWindow.offsetWidth, this.refs.GameWindow.offsetHeight);
 		this.renderer.setPixelRatio( window.devicePixelRatio );
 
+		this.renderer.shadowMap.enabled = true;
+		this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+		// this.renderer.shadowMapEnabled = true;
+
 		this.camera = new THREE.PerspectiveCamera
 		(
 			45, //View angle
@@ -95,6 +108,10 @@ export default class GameWindow extends React.Component
 			10000 //Far
 		);
 		this.scene.add(this.camera);
+
+		this.camera.position.z = 19;
+		this.camera.position.y = 3;
+		this.camera.lookAt(new THREE.Vector3(0,0,0));
 
 		this.hjnToGameState("++/8/10/12/12/2AaaaaaaA2/3AaaaaA3/12/12/3BbbbbB3/2BbbbbbbB2/12/12/10/8/--");
 
@@ -170,8 +187,8 @@ export default class GameWindow extends React.Component
 			var mesh = new THREE.Mesh( geometry, material );
 			toti.scene.add(mesh);
 
-			mesh.rotation.y = -0.29;
-			mesh.rotation.x = 0.49;
+			// mesh.rotation.y = -0.29;
+			// mesh.rotation.x = 0.49;
 			mesh.position.z = -16.5;
 
 			mesh.visible = false;
@@ -234,18 +251,28 @@ export default class GameWindow extends React.Component
 		var skybox = new THREE.Mesh( skyboxGeom, skyboxMaterial );
 
 
-		skybox.rotation.y = -0.29;
-		skybox.rotation.x = 0.49;
+		// skybox.rotation.y = -0.29;
+		// skybox.rotation.x = 0.49;
 
 		this.scene.add( skybox );
+
+		this.vse.add(skybox);
 		
 
 		const pointLight = new THREE.PointLight(0xFFFFFF, 1.0);
-		pointLight.position.x = 10;
-		pointLight.position.y = 50;
-		pointLight.position.z = 130;
+		pointLight.position.x = -20;
+		pointLight.position.y = 20;
+		pointLight.position.z = -7;
 
-		this.scene.add(pointLight);
+		pointLight.castShadow = true;
+
+		pointLight.shadowMapWidth = 1024; // default is 512. Povečaj če hočeš lepši shadow!
+		pointLight.shadowMapHeight = 1024; // default is 512. Beware! Laggy stuff
+
+		this.vse.add(pointLight); 
+
+		
+
 	}
 
 	resize()
@@ -271,7 +298,7 @@ export default class GameWindow extends React.Component
 			
 			ajax.POST("/endTurn", data, function(response)
 			{
-				console.log(response);
+				// console.log(response);
 
 			});
 
@@ -331,13 +358,101 @@ export default class GameWindow extends React.Component
 	{
 		var prevPos = this.getSelectedPiecePosition();
 
+		// console.log(this.gameState1[prevPos.y]);
+		console.log(this.gameInfo.piece.position.x + "," + this.gameInfo.piece.position.z);
+
 		var tmp = this.gameState1[prevPos.y][prevPos.x];
 		this.gameState1[prevPos.y][prevPos.x] = "O";
-
-		this.gameInfo.piece.position.z = this.gameInfo.zMin + y;
-		this.gameInfo.piece.position.x = this.gameInfo.xMin + x;
-
 		this.gameState1[y][x] = tmp;
+
+		// this.gameInfo.piece.position.z = this.gameInfo.zMin + y;
+		// this.gameInfo.piece.position.x = this.gameInfo.xMin + x;
+
+		var toZ = this.gameInfo.zMin + y;
+		var toX = this.gameInfo.xMin + x;
+
+		var kamZ = "";
+		var kamX = "";
+
+
+		if (this.gameInfo.piece.position.z < toZ)
+		{
+			kamZ = "gor";
+		}
+		else if (this.gameInfo.piece.position.z > toZ)
+		{
+			kamZ = "dol";
+		}
+		if (this.gameInfo.piece.position.x < toX)
+		{
+			kamX = "gor";
+		}
+		else if (this.gameInfo.piece.position.x > toX)
+		{
+			kamX = "dol";
+		}	
+
+
+		var toti = this;
+
+		var overTime = setInterval(function()
+		{
+			if (kamX != "" || kamZ != "")
+			{
+				if (toti.gameInfo.piece.position.z < toZ && kamZ == "gor")
+				{
+					toti.gameInfo.piece.position.z += 0.05;
+				}
+				else if (toti.gameInfo.piece.position.z > toZ && kamZ == "gor")
+				{
+					// console.log("PLEEES");
+					kamZ = "";
+				}
+				else if (toti.gameInfo.piece.position.z > toZ && kamZ == "dol")
+				{
+					toti.gameInfo.piece.position.z -= 0.05;
+				}
+				else if (toti.gameInfo.piece.position.z < toZ && kamZ == "dol")
+				{
+					kamZ = "";
+				}
+
+
+				if (toti.gameInfo.piece.position.x < toX && kamX == "gor")
+				{
+					toti.gameInfo.piece.position.x += 0.05;
+				}
+				else if (toti.gameInfo.piece.position.x > toX && kamX == "gor")
+				{
+					kamX = "";
+				}
+				else if (toti.gameInfo.piece.position.x > toX && kamX == "dol")
+				{
+					toti.gameInfo.piece.position.x -= 0.05;
+				}
+				else if (toti.gameInfo.piece.position.x < toX && kamX == "dol")
+				{
+					kamX = "";
+				}
+
+			}
+			else
+			{	
+				toti.gameInfo.piece.position.z = toti.gameInfo.zMin + y;
+				toti.gameInfo.piece.position.x = toti.gameInfo.xMin + x;
+				console.log(toti.gameInfo.piece.position.z);
+				console.log(toti.gameInfo.piece.position.x);
+
+				toti.gameInfo.piece = null;
+				clearInterval(overTime)
+
+			}
+			// console.log(toti.gameInfo.piece.position.z);
+			// console.log(toZ);
+
+		}, 10);
+
+		
 	}
 
 	movePieceAtIndex(srcX, srcY, destX, destY)
@@ -346,6 +461,9 @@ export default class GameWindow extends React.Component
 		var fig = null;
 		// console.log(pos);
 
+
+
+		// console.log(pos);
 		for (var i = 0; i < this.allFigs.length; i++)
 		{
 			// console.log(this.allFigs[i].position.x + "-" + this.allFigs[i].position.z);
@@ -355,8 +473,95 @@ export default class GameWindow extends React.Component
 				break;
 			}
 		}
-		fig.position.z = this.gameInfo.zMin + destY;
-		fig.position.x = this.gameInfo.xMin + destX;
+
+		// fig.position.z = this.gameInfo.zMin + destY;
+		// fig.position.x = this.gameInfo.xMin + destX;
+
+		var toZ = this.gameInfo.zMin + destY;
+		var toX = this.gameInfo.xMin + destX;
+
+		var kamZ = "";
+		var kamX = "";
+
+
+		if (fig.position.z < toZ)
+		{
+			kamZ = "gor";
+		}
+		else if (fig.position.z > toZ)
+		{
+			kamZ = "dol";
+		}
+		if (fig.position.x < toX)
+		{
+			kamX = "gor";
+		}
+		else if (fig.position.x > toX)
+		{
+			kamX = "dol";
+		}	
+
+
+		var toti = this;
+
+		var overTime = setInterval(function()
+		{
+			if (kamX != "" || kamZ != "")
+			{
+				if (fig.position.z < toZ && kamZ == "gor")
+				{
+					fig.position.z += 0.05;
+				}
+				else if (fig.position.z > toZ && kamZ == "gor")
+				{
+					// console.log("PLEEES");
+					kamZ = "";
+				}
+				else if (fig.position.z > toZ && kamZ == "dol")
+				{
+					fig.position.z -= 0.05;
+				}
+				else if (fig.position.z < toZ && kamZ == "dol")
+				{
+					kamZ = "";
+				}
+
+
+				if (fig.position.x < toX && kamX == "gor")
+				{
+					fig.position.x += 0.05;
+				}
+				else if (fig.position.x > toX && kamX == "gor")
+				{
+					kamX = "";
+				}
+				else if (fig.position.x > toX && kamX == "dol")
+				{
+					fig.position.x -= 0.05;
+				}
+				else if (fig.position.x < toX && kamX == "dol")
+				{
+					kamX = "";
+				}
+
+			}
+			else
+			{
+				fig.position.z = toti.gameInfo.zMin + destY;
+				fig.position.x = toti.gameInfo.xMin + destX;
+
+				console.log(fig.position.z);
+				console.log(fig.position.x);
+
+				console.log("HALELUJAH");
+
+				clearInterval(overTime);
+				// toti.gameInfo.piece = null;
+			}
+			// console.log(toti.gameInfo.piece.position.z);
+			// console.log(toZ);
+
+		}, 10);
 
 
 		// console.log(this.gameState1[srcX][srcY]);
@@ -427,7 +632,7 @@ export default class GameWindow extends React.Component
 		ajax.GET('/possibleMoves/', function(response)
 		{
 			var mozniPremiki = JSON.parse(response);
-			console.log(mozniPremiki);
+			// console.log(mozniPremiki);
 
 			// console.log(toti.scene.children[4].children[0]);
 			if (mozniPremiki != null)
@@ -439,7 +644,7 @@ export default class GameWindow extends React.Component
 
 					// toti.hardSelect(toti.scene.children[4].children[0].children[pot[mozniPremiki[i].row - 1][mozniPremiki[i].col - 1]]);
 					
-					tiles.push(toti.scene.children[4].children[0].children[pot[mozniPremiki[i].row - 1][mozniPremiki[i].col - 1]]);	
+					tiles.push(toti.scene.children[2].children[2].children[0].children[pot[mozniPremiki[i].row - 1][mozniPremiki[i].col - 1]]);	
 
 				}
 				callback(tiles);
@@ -593,6 +798,10 @@ export default class GameWindow extends React.Component
 					mesh.materialBuffer = [];
 					mesh.descriptor = "tile";
 
+					
+
+					mesh.receiveShadow = true;
+
 					tilesGroup.add(mesh);
 
 					if (this.gameState1[rowCount][colCount] != "O" && this.gameState1[rowCount][colCount] != "+" && this.gameState1[rowCount][colCount] != "-") 
@@ -626,6 +835,8 @@ export default class GameWindow extends React.Component
 						mesh.hardAndSoftColorOffset = fig_HardAndSoftSelectColotOffset;
 						mesh.materialBuffer = [];
 						mesh.descriptor = "fig";
+						mesh.castShadow = true;
+						mesh.receiveShadow = true;
 
 						figs[whichOne].group.add(mesh);
 
@@ -647,27 +858,44 @@ export default class GameWindow extends React.Component
 				++colCount;
 			}
 
-			newBoardGroup.rotation.y = -0.29;
-			newBoardGroup.rotation.x = 0.49;
-			newBoardGroup.position.z = -16.5;
+			// newBoardGroup.rotation.y = -0.29;
+			// newBoardGroup.rotation.x = 0.49;
+			// newBoardGroup.position.z = -16.5;
 
 			if (this.gameInfo.player == "+")
 			{
 				newBoardGroup.rotation.y += 3.14159;
 				// this.scene.children[1].position.x -= 10.14159;
 			}
+			var particleSystem = this.createParticleSystem();
+  			// this.scene.add(particleSystem);
+			newBoardGroup.add(particleSystem);
+			this.vse.add(newBoardGroup);
+			this.vse.rotation.y = -.5;
+			this.vse.rotation.x = .5;
 
-			this.scene.add(newBoardGroup);
-
-			
-			
+			// this.scene.add(newBoardGroup);
 			
 			this.refs.GameWindow.appendChild(this.renderer.domElement);
 			// this.listenOnSocket();
 			// this.startGame();
 			// console.log(this.props.socket);
 
-			// console.log(this.scene);
+			// this.controls = new OrbitControls( this.camera, this.renderer.domElement );
+			// this.controls.addEventListener( 'change', this.renderer );
+			// this.controls.autoRotate = true;
+			// this.controls.enableDamping = true;
+			// this.controls.dampingFactor = 0.25;
+			// this.controls.enableZoom = false;
+
+			// console.log(this.controls);
+
+			this.scene.add(this.vse);
+
+			var light = new THREE.AmbientLight( 0x404040 ); // soft white light
+		this.vse.add( light );
+
+			console.log(this.scene);
 			// this.isReady = true;
 			if (this.enemyIsReady == true)
 			{
@@ -692,14 +920,14 @@ export default class GameWindow extends React.Component
 				{
 					document.querySelector('.switch > input').checked = true;
 					toti.myTurn = true;
-					console.log(data.yourTurn);
+					// console.log(data.yourTurn);
 				}
 				else
 				{
 					document.querySelector('.switch').checked = false;
 					toti.myTurn = false;
 					document.querySelector('.switch').style.pointerEvents = "none";
-					console.log(data.yourTurn);
+					// console.log(data.yourTurn);
 				}
 
 				toti.allObjectsAreLoaded();
@@ -707,7 +935,7 @@ export default class GameWindow extends React.Component
 			else if (data.action == 'moviePiece')
 			{
 
-				console.log("Enemy je premakno figuro");
+				// console.log("Enemy je premakno figuro");
 				toti.movePieceAtIndex(data.src.x, data.src.y, data.dest.x, data.dest.y);
 			}
 			else if (data.action == 'startTurn')
@@ -719,6 +947,20 @@ export default class GameWindow extends React.Component
 					toti.myTurn = true;
 					
 				}
+			}
+			else if (data.action == 'deletePiece')
+			{
+				toti.gameState1[data.info.y][data.info.x] = 'O';
+
+				if (data.info.team == 'A')
+				{
+					 toti.scene.children[2].children[2].children[1].children[parseInt(data.info.children)].children.splice(parseInt(data.info.children1), 1);
+				}
+				else if (data.info.team == 'B')
+				{
+					 toti.scene.children[2].children[2].children[2].children[parseInt(data.info.children)].children.splice(parseInt(data.info.children1), 1);;
+				}
+				// console.log(data.info);
 			}
 		});
 	}
@@ -916,7 +1158,7 @@ export default class GameWindow extends React.Component
 			}
 			else
 			{
-				console.log(object.materialBuffer.length);
+				// console.log(object.materialBuffer.length);
 				object.material = object.materialBuffer.pop();
 				object.isHardSelected = false;
 			}
@@ -937,11 +1179,46 @@ export default class GameWindow extends React.Component
 				object.materialBuffer.push(material);
 				material = object.material.clone();
 
-				for (var i = 0; i < material.materials.length; i++)
+				var offsetTMP = 
 				{
-					material.materials[i].color.setRGB(material.materials[i].color.r + offset.r, material.materials[i].color.g + offset.g, material.materials[i].color.b + offset.b);
-				}
-				object.material = material;
+					r: 0,
+					g: 0,
+					b: 0
+				};
+
+				// for (var i = 0; i < material.materials.length; i++)
+				// {
+				// 	material.materials[i].color.setRGB(material.materials[i].color.r + offset.r, material.materials[i].color.g + offset.g, material.materials[i].color.b + offset.b);
+				// }
+				// object.material = material;
+
+				var myVar = setInterval(function()
+				{
+					offsetTMP.r += 0.01;
+					offsetTMP.g += 0.01;
+					offsetTMP.b += 0.01;
+
+
+					for (var i = 0; i < material.materials.length; i++)
+					{
+						material.materials[i].color.setRGB(material.materials[i].color.r + offsetTMP.r, material.materials[i].color.g + offsetTMP.g, material.materials[i].color.b + offsetTMP.b);
+					}
+
+
+					object.material = material;
+
+					if (offsetTMP.r > 0.1)
+					{
+
+						clearInterval(myVar);
+
+						for (var i = 0; i < material.materials.length; i++)
+						{
+							material.materials[i].color.setRGB(material.materials[i].color.r + offset.r, material.materials[i].color.g + offset.g, material.materials[i].color.b + offset.b);
+						}
+						object.material = material;
+					}
+				}, 20);
 			}
 			else
 			{
@@ -978,12 +1255,12 @@ export default class GameWindow extends React.Component
 		{
 
 				// console.log(this.scene.children[4].children[1].children.length);	
-			for (var i = 0; i < this.scene.children[4].children[2].children.length; i++)
+			for (var i = 0; i < this.scene.children[2].children[2].children[2].children.length; i++)
 			{
-				for (var j = 0; j < this.scene.children[4].children[2].children[i].children.length; j++)
+				for (var j = 0; j < this.scene.children[2].children[2].children[2].children[i].children.length; j++)
 				{
-					this.scene.children[4].children[2].children[i].children[j].isHoverable = false;
-					this.scene.children[4].children[2].children[i].children[j].isSelectable = false;	
+					this.scene.children[2].children[2].children[2].children[i].children[j].isHoverable = false;
+					this.scene.children[2].children[2].children[2].children[i].children[j].isSelectable = false;	
 				}
 			}
 		}
@@ -995,15 +1272,210 @@ export default class GameWindow extends React.Component
 		{
 
 				// console.log(this.scene.children[4].children[1].children.length);	
-			for (var i = 0; i < this.scene.children[4].children[2].children.length; i++)
+			for (var i = 0; i < this.scene.children[2].children[2].children[2].children.length; i++)
 			{
-				for (var j = 0; j < this.scene.children[4].children[2].children[i].children.length; j++)
+				for (var j = 0; j < this.scene.children[2].children[2].children[2].children[i].children.length; j++)
 				{
-					this.scene.children[4].children[2].children[i].children[j].isHoverable = true;
-					this.scene.children[4].children[2].children[i].children[j].isSelectable = true;	
+					this.scene.children[2].children[2].children[2].children[i].children[j].isHoverable = true;
+					this.scene.children[2].children[2].children[2].children[i].children[j].isSelectable = true;	
 				}
 			}
 		}
+	}
+
+	removeElementAtIndex(x, y)
+	{
+		--x;
+		--y;
+		var coords = this.boardToWorldCoords(x,y);
+
+		this.gameState1[y][x] = 'O';
+
+		var teamA = this.scene.children[2].children[2].children[1];
+		var teamB = this.scene.children[2].children[2].children[2];
+
+		var ajax = new Ajax();
+
+		for (var i = 0; i < teamA.children[0].children.length; i++)
+		{
+			if (teamA.children[0].children[i].position.x == coords.x && teamA.children[0].children[i].position.z == coords.z)
+			{
+				teamA.children[0].children.splice(i, 1);
+
+				var data = {myName: Cookie.get('eMail'), info:{ team: 'A', children: 0, children1: i, x: x, y: y}};
+				data = "data=" + encodeURIComponent(JSON.stringify(data));
+
+				
+				ajax.POST("/deletePiece", data, function(response)
+				{
+					// console.log(response);
+
+				});
+			}
+		}
+		for (var i = 0; i < teamA.children[1].children.length; i++)
+		{
+			if (teamA.children[1].children[i].position.x == coords.x && teamA.children[1].children[i].position.z == coords.z)
+			{
+				teamA.children[1].children.splice(i, 1);
+
+				var data = {myName: Cookie.get('eMail'), info:{ team: 'A', children: 1, children1: i, x: x, y: y}};
+				data = "data=" + encodeURIComponent(JSON.stringify(data));
+
+				
+				ajax.POST("/deletePiece", data, function(response)
+				{
+					// console.log(response);
+
+				});
+
+			}
+		}
+
+		for (var i = 0; i < teamB.children[0].children.length; i++)
+		{
+			if (teamB.children[0].children[i].position.x == coords.x && teamB.children[0].children[i].position.z == coords.z)
+			{
+				teamB.children[0].children.splice(i, 1);
+
+				var data = {myName: Cookie.get('eMail'), info:{ team: 'B', children: 0, children1: i, x: x, y: y}};
+				data = "data=" + encodeURIComponent(JSON.stringify(data));
+
+				
+				ajax.POST("/deletePiece", data, function(response)
+				{
+					// console.log(response);
+
+				});
+
+			}
+		}
+		for (var i = 0; i < teamB.children[1].children.length; i++)
+		{
+			if (teamB.children[1].children[i].position.x == coords.x && teamB.children[1].children[i].position.z == coords.z)
+			{
+				teamB.children[1].children.splice(i, 1);
+
+				var data = {myName: Cookie.get('eMail'), info:{ team: 'B', children: 1, children1: i, x: x, y: y}};
+				data = "data=" + encodeURIComponent(JSON.stringify(data));
+
+				
+				ajax.POST("/deletePiece", data, function(response)
+				{
+					// console.log(response);
+
+				});
+
+			}
+		}
+
+
+		// console.log(teamA);
+		// console.log(teamB);
+
+
+		// console.log(coords);
+	}
+
+	createParticleSystem()
+	{
+     
+		// The number of particles in a particle system is not easily changed.
+		var particleCount = 1000;
+
+		// Particles are just individual vertices in a geometry
+		// Create the geometry that will hold all of the vertices
+		var particles = new THREE.Geometry();
+
+		// Create the vertices and add them to the particles geometry
+		for (var p = 0; p < particleCount; p++) {
+
+		// This will create all the vertices in a range of -200 to 200 in all directions
+		var x = Math.random()- 0.5;
+		var y = Math.random();
+		var z = Math.random()+ 0.5;
+		   
+		// Create the vertex
+		var particle = new THREE.Vector3(x, y, z);
+		particle.tempX = x;
+		particle.tempZ = z;
+		particle.cosSin = Math.random() * 6.18;
+
+		// Add the vertex to the geometry
+		particles.vertices.push(particle);
+		}
+
+		// Create the material that will be used to render each vertex of the geometry
+		var particleMaterial = new THREE.PointsMaterial(
+		{color: 0xffffff, 
+		 size: 0.1,
+		 map: THREE.ImageUtils.loadTexture("images/snowflake.png"),
+		 // blending: THREE.AdditiveBlending,
+		 transparent: true
+		});
+
+		// particleMaterial.visible = false;
+
+		// Create the particle system
+		var particleSystem = new THREE.Points(particles, particleMaterial);
+		particleSystem.visible = false;
+
+
+		// particleSystem.rotation.y = -0.29;
+		// particleSystem.rotation.x = 0.49;
+		// particleSystem.position.z = -16.5;
+
+		// if (this.gameInfo.player == "+")
+		// {
+		// 	particleSystem.rotation.y += 3.14159;
+		// }
+
+		this.particleSystem = particleSystem;
+		// particleSystem.position.z -= 1; 
+
+		return particleSystem;  
+	}
+
+	animateParticles()
+	{
+		this.particleSystem.visible = true;
+		var verts = this.particleSystem.geometry.vertices;
+		var toti = this;
+
+		var counter = Array.apply(null, Array(verts.length)).map(Number.prototype.valueOf,0);
+
+		// var coords = this.boardToWorldCoords(x, y):
+		// console.log(coords);
+		this.particleSystem.position.z = this.gameInfo.piece.position.z;
+		this.particleSystem.position.x = this.gameInfo.piece.position.x;
+
+		setInterval(function(){ 
+
+
+		for(var i = 0; i < verts.length; i++)
+		{
+			var vert = verts[i];
+			
+			// vert.y += Math.random()*0.05 - 0.025;
+			// vert.x += Math.random()*0.05 - 0.025;
+			// vert.z += Math.random()*0.05 - 0.025;
+
+			vert.x = Math.cos(vert.cosSin)*0.5;
+			vert.z = Math.sin(vert.cosSin)*0.5;
+
+			vert.cosSin += 0.01;
+			
+		}
+			
+		toti.particleSystem.geometry.verticesNeedUpdate = true;
+
+		}, 20);
+     
+	}
+
+	unAnimatePartciles()
+	{
+		this.particleSystem.visible = false;
 	}
 
 
@@ -1012,14 +1484,21 @@ export default class GameWindow extends React.Component
 
 		if (this.gameInfo.needsUpdate == true) 
 		{
-			this.scene.children[1].rotation.y -= (this.mouse1.prevX - this.mouse1.X) * .05;
-			this.scene.children[1].rotation.x -= (this.mouse1.prevY - this.mouse1.Y) * .05;
-			// this.scene.children[2].rotation.y -= (this.mouse1.prevX - this.mouse1.X) * .05;
-			// this.scene.children[2].rotation.x -= (this.mouse1.prevY - this.mouse1.Y) * .05;
-			this.scene.children[3].rotation.y -= (this.mouse1.prevX - this.mouse1.X) * .05;
-			this.scene.children[3].rotation.x -= (this.mouse1.prevY - this.mouse1.Y) * .05;
-			this.scene.children[4].rotation.y -= (this.mouse1.prevX - this.mouse1.X) * .05;
-			this.scene.children[4].rotation.x -= (this.mouse1.prevY - this.mouse1.Y) * .05;
+			// this.scene.children[0].rotation.y -= (this.mouse1.prevX - this.mouse1.X) * .05;
+			// this.scene.children[0].rotation.x -= (this.mouse1.prevY - this.mouse1.Y) * .05;
+
+			// this.scene.children[1].rotation.y -= (this.mouse1.prevX - this.mouse1.X) * .05;
+			// this.scene.children[1].rotation.x -= (this.mouse1.prevY - this.mouse1.Y) * .05;
+			this.scene.children[2].rotation.y -= (this.mouse1.prevX - this.mouse1.X) * .05;
+			this.scene.children[2].rotation.x -= (this.mouse1.prevY - this.mouse1.Y) * .05;
+
+			// console.log(this.scene);
+			// this.scene.children[3].rotation.y -= (this.mouse1.prevX - this.mouse1.X) * .05;
+			// this.scene.children[3].rotation.x -= (this.mouse1.prevY - this.mouse1.Y) * .05;
+			// this.scene.children[4].rotation.y -= (this.mouse1.prevX - this.mouse1.X) * .05;
+			// this.scene.children[4].rotation.x -= (this.mouse1.prevY - this.mouse1.Y) * .05;
+			// this.scene.children[5].rotation.y -= (this.mouse1.prevX - this.mouse1.X) * .05;
+			// this.scene.children[5].rotation.x -= (this.mouse1.prevY - this.mouse1.Y) * .05;
 			// this.scene.children[4].rotation.y -= (this.mouse1.prevX - this.mouse1.X) * .05;
 			// this.scene.children[4].rotation.x -= (this.mouse1.prevY - this.mouse1.Y) * .05;
 			// this.scene.children[5].rotation.y -= (this.mouse1.prevX - this.mouse1.X) * .05;
@@ -1029,15 +1508,29 @@ export default class GameWindow extends React.Component
 			// this.scene.children[7].rotation.y -= (this.mouse1.prevX - this.mouse1.X) * .05;
 			// this.scene.children[7].rotation.x -= (this.mouse1.prevY - this.mouse1.Y) * .05;
 
+			// this.ples +=  (this.mouse1.prevX - this.mouse1.X)*-0.05;
+			// this.ples1 += (this.mouse1.prevY - this.mouse1.Y)*-0.05;
+			// this.ples2 += ((this.mouse1.prevX - this.mouse1.X)*-0.05 + (this.mouse1.prevY - this.mouse1.Y)*-0.05);
+
+			// this.camera.position.x =  Math.sin( this.ples )*20;
+			// // this.camera.position.y =  Math.sin( this.ples1 )*20;
+			// this.camera.position.z =  Math.cos( this.ples)*20 - 16.5;
+
+			// // this.camera.up.set( 0, 0, 1 + Math.sin( this.ples1 )*20 - 1 );
+			// this.camera.lookAt( new THREE.Vector3( 0, 0, -16.5 ));
+
 			this.gameInfo.needsUpdate = false;
 
 			document.body.style.cursor = "auto";
+
+			
 
 		}
 		else if(this.gameInfo.canSelect == true && this.myTurn == true)
 		{
 			this.rayCaster.setFromCamera( this.mouse, this.camera );
-			var intersects = this.rayCaster.intersectObjects( this.scene.children[4].children, true);
+			// var test = this.scene.children[4].clone();
+			var intersects = this.rayCaster.intersectObjects( this.scene.children[2].children, true);
 
 			if (intersects.length > 0)
 			{
@@ -1062,6 +1555,7 @@ export default class GameWindow extends React.Component
 					document.body.style.cursor = "auto";
 					if (this.hoveredPiece != null)
 					{
+
 						this.unSoftSelect(this.hoveredPiece);
 						this.hoveredPiece = null;
 					}
@@ -1071,10 +1565,14 @@ export default class GameWindow extends React.Component
 				{	
 					if (intersects[0].object.descriptor == "fig")
 					{
+						// console.log(this.gameInfo.piece);
 						if (this.gameInfo.piece == null)
 						{
+
+
 							this.hardSelect(intersects[0].object);
 							this.gameInfo.piece = intersects[0].object;
+							this.animateParticles();
 
 							this.makeUnHoverableAndClickable("teamA");
 
@@ -1099,6 +1597,7 @@ export default class GameWindow extends React.Component
 						}
 						else
 						{
+							this.unAnimatePartciles();
 							this.unHardSelect(this.gameInfo.piece);
 							for (var i = 0; i < this.possbbleMoveTiles.length; i++)
 							{
@@ -1122,6 +1621,7 @@ export default class GameWindow extends React.Component
 							this.gameInfo.canSelect = false;
 							
 							this.unHardSelect(this.gameInfo.piece);
+
 							
 							for (var i = 0; i < this.possbbleMoveTiles.length; i++)
 							{
@@ -1157,12 +1657,19 @@ export default class GameWindow extends React.Component
 								toti.prevFig.val = returnedData.prevFig.val,
 								toti.details.val = returnedData.details.val,
 								toti.castleMoves.val = returnedData.castleMoves.val
+								toti.kje.val = returnedData.kje.val;
 
-								console.log(toti.details.val);
+								if (toti.kje.val != null)
+								{
+									toti.removeElementAtIndex(toti.kje.val.drugi, toti.kje.val.en);
+								}
+
+								// console.log(toti.kje.val);
 							}, data);
 
 
 							this.moveSelectedPiece(pos.x, pos.y);
+							this.unAnimatePartciles();
 
 
 							var data = {myName: Cookie.get('eMail'), src: {x: pos1.x, y: pos1.y}, dest: {x: pos.x, y: pos.y}};
@@ -1171,12 +1678,12 @@ export default class GameWindow extends React.Component
 							
 							ajax.POST("/iMoovedMyPiece", data, function(response)
 							{
-								console.log(response);
+								// console.log(response);
 
 							});
 
 							
-							this.gameInfo.piece = null;
+							// this.gameInfo.piece = null;
 						}
 					}
 				}
@@ -1186,26 +1693,26 @@ export default class GameWindow extends React.Component
 			}
 
 
-			/*-------------------Temprary je to, ignoraj---------------------*/
-			if (this.mouse1.leftDown == true) 
-			{
-				intersects = this.rayCaster.intersectObjects( this.scene.children[4].children, true );
+			// /*-------------------Temprary je to, ignoraj---------------------*/
+			// if (this.mouse1.leftDown == true) 
+			// {
+			// 	intersects = this.rayCaster.intersectObjects( this.scene.children[4].children, true );
 
-				if (intersects.length > 0) 
-				{
-					// console.log(intersects[0].object.position.x);
-					this.gameInfo.travelToX = intersects[0].object.position.x - this.gameInfo.xMin;
-					this.gameInfo.travelToY = intersects[0].object.position.z - this.gameInfo.zMin;
-				}
-			}
+			// 	if (intersects.length > 0) 
+			// 	{
+			// 		// console.log(intersects[0].object.position.x);
+			// 		this.gameInfo.travelToX = intersects[0].object.position.x - this.gameInfo.xMin;
+			// 		this.gameInfo.travelToY = intersects[0].object.position.z - this.gameInfo.zMin;
+			// 	}
+			// }
 
 
 			
 		}
 
-
 		requestAnimationFrame(this.update.bind(this));//Contonue
 		this.renderer.render( this.scene, this.camera );//da loop
+		// this.controls.update();
    			
 	}
 

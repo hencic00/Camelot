@@ -59,31 +59,33 @@ function getJumpType(figura, preskocen)
 
 function izvediPremik(figura,target,deska,dolzina,type)
 {
-	if(dolzina==2) 
-	{
-		if(type=="LEAP")
-		{
-			var preskocenLocation = (figura.row + parseInt((target.row-figura.row)/2 , 10))*SIRINA + figura.col+parseInt((target.col-figura.col)/2 , 10);
-			deska.val = deska.val.substr(0, preskocenLocation) + "O" + deska.val.substr(preskocenLocation+1);
-		}
-	}
-	
-	deska.val = deska.val.substr(0, target.row*SIRINA + target.col) + figura.znak + deska.val.substr(target.row*SIRINA + target.col + 1);
-	if(figura.row == 1)
-	{
-		deska.val = deska.val.substr(0, figura.row*SIRINA + figura.col) + "+" + deska.val.substr(figura.row*SIRINA + figura.col + 1);
-		
-	}
-	else if(figura.row == 16)
-	{
-		deska.val = deska.val.substr(0, figura.row*SIRINA + figura.col) + "-" + deska.val.substr(figura.row*SIRINA + figura.col + 1);
-		
-	}
-	else
-	{
-		deska.val = deska.val.substr(0, figura.row*SIRINA + figura.col) + "O" + deska.val.substr(figura.row*SIRINA + figura.col + 1);
-		
-	}
+    var hencic = 0;
+    if(dolzina==2)
+    {
+        if(type=="LEAP")
+        {
+            var preskocenLocation = (figura.row + parseInt((target.row-figura.row)/2 , 10))*SIRINA + figura.col+parseInt((target.col-figura.col)/2 , 10);
+            deska.val = deska.val.substr(0, preskocenLocation) + "O" + deska.val.substr(preskocenLocation+1);
+            hencic = {en: figura.row + parseInt((target.row-figura.row)/2 , 10), drugi: figura.col+parseInt((target.col-figura.col)/2 , 10)};
+        }
+    }
+   
+    deska.val = deska.val.substr(0, target.row*SIRINA + target.col) + figura.znak + deska.val.substr(target.row*SIRINA + target.col + 1);
+    if(figura.row == 1)
+    {
+        deska.val = deska.val.substr(0, figura.row*SIRINA + figura.col) + "+" + deska.val.substr(figura.row*SIRINA + figura.col + 1);
+       
+    }
+    else if(figura.row == 16)
+    {
+        deska.val = deska.val.substr(0, figura.row*SIRINA + figura.col) + "-" + deska.val.substr(figura.row*SIRINA + figura.col + 1);
+       
+    }
+    else
+    {
+        deska.val = deska.val.substr(0, figura.row*SIRINA + figura.col) + "O" + deska.val.substr(figura.row*SIRINA + figura.col + 1);
+    }
+    return hencic;
 }
 
 function dobiNapadanje(figura, deska) 
@@ -330,7 +332,7 @@ module.exports =
 			}
 	},
 
-	validiraj: function(premik, deska, prevMove,prevFig,player,details,castleMoves) 
+	validiraj: function(premik, deska, prevMove,prevFig,player,details,castleMoves, kje) 
 	{
 		var pozicija = premik.split('>'); 
 		var zacetnaPozicija =  pozicija[0].split(',');
@@ -502,7 +504,8 @@ module.exports =
 				else if(prevMove.val == null)
 				{
 					details.val = "PRAVILNO: \"\" v CANTER ali LEAP";
-					izvediPremik(figura,poljeNew,deska,dolzina,jumpType);
+					kje.val = izvediPremik(figura,poljeNew,deska,dolzina,jumpType);
+					// console.log(kje);
 					prevMove.val = jumpType;
 					prevFig.val = pozicija[1];
 					return true;
@@ -510,13 +513,15 @@ module.exports =
 				else if(prevMove.val == jumpType)
 				{ 
 					details.val = "PRAVILNO: Nadaljuje s tam kaj dela";
-					izvediPremik(figura,poljeNew,deska,dolzina,jumpType);
+					kje.val = izvediPremik(figura,poljeNew,deska,dolzina,jumpType);
+					// console.log(kje);
 					prevFig.val = pozicija[1];
 					return true;
 				}
 				else if((prevMove.val == "CANTER"|| prevMove.val == "KCHARGE") && jumpType == "LEAP" && figura.znak.charCodeAt(0)<67) 
 				{ 
-					izvediPremik(figura,poljeNew,deska,dolzina,jumpType);
+					kje.val = izvediPremik(figura,poljeNew,deska,dolzina,jumpType);
+					// console.log(kje);
 					details.val = "PRAVILNO: Knight's Charge";
 					prevMove.val = "KCHARGE";
 					prevFig.val = pozicija[1];

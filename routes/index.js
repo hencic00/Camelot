@@ -277,9 +277,10 @@ router.get('/validate', function(req, res)
 	var prevFig = {val: null};
 	var details = {val: ""};
 	var castleMoves = {val: 0};
+	var kje = {val: null};
 
 
-	var result = validate.validiraj(premik, gameState, prevMove, prevFig, data.castle, details, castleMoves);
+	var result = validate.validiraj(premik, gameState, prevMove, prevFig, data.castle, details, castleMoves, kje);
 	var send = null;
 
 
@@ -291,7 +292,8 @@ router.get('/validate', function(req, res)
 			prevMove: prevMove,
 			prevFig: prevFig,
 			details: details,
-			castleMoves: castleMoves
+			castleMoves: castleMoves,
+			kje: kje
 		};
 	}
 	else
@@ -302,11 +304,12 @@ router.get('/validate', function(req, res)
 			prevMove: null,
 			prevFig: null,
 			details: null,
-			castleMoves: null
+			castleMoves: null,
+			kje: kje
 		};
 	}
 
-	// console.log(data.castle);
+	console.log(kje);
 
 	res.send(send);
 
@@ -334,6 +337,20 @@ router.post('/endTurn', function(req, res)
 	client.hget("enemies", data.myName, function (err, obj)
 	{
 		res.io.emit(obj, {action: 'startTurn'});
+	});
+
+	res.send("Forwarded");
+
+});
+
+router.post('/deletePiece', function(req, res)
+{
+	var data = JSON.parse(req.body.data);
+	
+
+	client.hget("enemies", data.myName, function (err, obj)
+	{
+		res.io.emit(obj, {action: 'deletePiece', info: data.info});
 	});
 
 	res.send("Forwarded");
