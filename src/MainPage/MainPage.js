@@ -5,7 +5,7 @@ import Content from "./Content/Content.js";
 import Cookie from 'js-cookie';
 
 require("./MainPage.scss");
-var socket = require('socket.io-client')('http://139.59.146.155:4000', {query: "ime=" + Cookie.get('eMail')});
+var socket = require('socket.io-client')('http://localhost:4000', {query: "ime=" + Cookie.get('eMail')});
 
 export default class MainPage extends React.Component
 {
@@ -27,20 +27,20 @@ export default class MainPage extends React.Component
 
 		var toti = this;
 
-		var xhr = new XMLHttpRequest();
-		xhr.open("GET", "./sounds/PianoL.mdct", true); // binarno slika locljivost 512*512, velikost dat. je 512*512/8 (1 bit = 1 piksel!)
-		xhr.responseType = "arraybuffer";
+		// var xhr = new XMLHttpRequest();
+		// xhr.open("GET", "./sounds/PianoL.mdct", true); // binarno slika locljivost 512*512, velikost dat. je 512*512/8 (1 bit = 1 piksel!)
+		// xhr.responseType = "arraybuffer";
 
-		xhr.onload = function(e) {
-			var final = toti.recieveSoundCMP(xhr.response);
+		// xhr.onload = function(e) {
+		// 	var final = toti.recieveSoundCMP(xhr.response);
 
-				var source = toti.audioCtx.createBufferSource();
-				source.buffer = final;
-				source.connect(toti.audioCtx.destination);
-				source.start();
-		}
+		// 		var source = toti.audioCtx.createBufferSource();
+		// 		source.buffer = final;
+		// 		source.connect(toti.audioCtx.destination);
+		// 		source.start();
+		// }
 
-		xhr.send();
+		// xhr.send();
 	}
 
 
