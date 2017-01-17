@@ -5,7 +5,7 @@ import Content from "./Content/Content.js";
 import Cookie from 'js-cookie';
 
 require("./MainPage.scss");
-var socket = require('socket.io-client')('http://localhost:4000', {query: "ime=" + Cookie.get('eMail')});
+var socket = require('socket.io-client')('http://139.59.146.155:4000', {query: "ime=" + Cookie.get('eMail')});
 
 export default class MainPage extends React.Component
 {
