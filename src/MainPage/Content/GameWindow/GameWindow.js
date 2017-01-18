@@ -81,9 +81,9 @@ export default class GameWindow extends React.Component
 
 		this.listenOnSocket();
 		window.addEventListener("resize", this.resize.bind(this));
-		document.onkeydown = function()
+		document.onkeydown = function(event)
 		{
-			toti.receiveBoard();
+			toti.receiveBoard(event);
 		};
 
 		document.querySelector('.switch').addEventListener('mouseup', this.endTurn.bind(this));
