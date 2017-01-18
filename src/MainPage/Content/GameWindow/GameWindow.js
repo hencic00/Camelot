@@ -2047,6 +2047,7 @@ export default class GameWindow extends React.Component
 		{
 
 			this.movePieceAtIndex(this.boardData.xFrom, this.boardData.yFrom, this.boardData.xTo, this.boardData.yTo);
+			console.log(this.boardData);
 			this.boardData = null;
 
 		}
