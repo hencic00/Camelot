@@ -83,7 +83,44 @@ export default class GameWindow extends React.Component
 		window.addEventListener("resize", this.resize.bind(this));
 		document.onkeydown = function(event)
 		{
-			toti.receiveBoard(event);
+			var x = event.which || event.keyCode;
+			if(x >= 48 && x <=57) //1234567890
+			{
+				srdsMove += String.fromCharCode(x);
+			}
+			else if(x == 188) //,
+			{
+				srdsMove += ",";
+			}
+			else if(x == 88) //x
+			{
+				srdsMove += ">"
+			}
+			else if(x == 173) //- pomeni da smo sestavli do konca
+			{
+				var explodeSRDS = srdsMove.split(">");
+				var leftSRDS = explodeSRDS[0].split(",");
+				var rightSRDS = explodeSRDS[1].split(",");
+
+				var xFrom = 16 - parseInt(leftSRDS[0]);
+				var yFrom = 12 - parseInt(leftSRDS[1]);
+
+				var xTo = 16 - parseInt(rightSRDS[0]);
+				var yTo = 12 - parseInt(rightSRDS[1]);
+
+				// console.log(explodeSRDS);
+				// console.log(leftSRDS);
+				// console.log(rightSRDS);
+				// console.log(xFrom+" "+yFrom + "->"+xTo+ " " + yTo);
+			}
+
+			this.boardData = 
+			{
+				xFrom: xFrom,
+				yFrom: yFrom,
+				xTo: xTo,
+				yTo: yTo
+			};
 		};
 
 		document.querySelector('.switch').addEventListener('mouseup', this.endTurn.bind(this));
@@ -321,47 +358,47 @@ export default class GameWindow extends React.Component
 		this.vse.add(pointLight); 
 	}
 
-	receiveBoard(event)
-	{
-		var x = event.which || event.keyCode;
-		if(x >= 48 && x <=57) //1234567890
-		{
-			srdsMove += String.fromCharCode(x);
-		}
-		else if(x == 188) //,
-		{
-			srdsMove += ",";
-		}
-		else if(x == 88) //x
-		{
-			srdsMove += ">"
-		}
-		else if(x == 173) //- pomeni da smo sestavli do konca
-		{
-			var explodeSRDS = srdsMove.split(">");
-			var leftSRDS = explodeSRDS[0].split(",");
-			var rightSRDS = explodeSRDS[1].split(",");
+	// receiveBoard(event)
+	// {
+	// 	var x = event.which || event.keyCode;
+	// 	if(x >= 48 && x <=57) //1234567890
+	// 	{
+	// 		srdsMove += String.fromCharCode(x);
+	// 	}
+	// 	else if(x == 188) //,
+	// 	{
+	// 		srdsMove += ",";
+	// 	}
+	// 	else if(x == 88) //x
+	// 	{
+	// 		srdsMove += ">"
+	// 	}
+	// 	else if(x == 173) //- pomeni da smo sestavli do konca
+	// 	{
+	// 		var explodeSRDS = srdsMove.split(">");
+	// 		var leftSRDS = explodeSRDS[0].split(",");
+	// 		var rightSRDS = explodeSRDS[1].split(",");
 
-			var xFrom = 16 - parseInt(leftSRDS[0]);
-			var yFrom = 12 - parseInt(leftSRDS[1]);
+	// 		var xFrom = 16 - parseInt(leftSRDS[0]);
+	// 		var yFrom = 12 - parseInt(leftSRDS[1]);
 
-			var xTo = 16 - parseInt(rightSRDS[0]);
-			var yTo = 12 - parseInt(rightSRDS[1]);
+	// 		var xTo = 16 - parseInt(rightSRDS[0]);
+	// 		var yTo = 12 - parseInt(rightSRDS[1]);
 
-			// console.log(explodeSRDS);
-			// console.log(leftSRDS);
-			// console.log(rightSRDS);
-			// console.log(xFrom+" "+yFrom + "->"+xTo+ " " + yTo);
-		}
+	// 		// console.log(explodeSRDS);
+	// 		// console.log(leftSRDS);
+	// 		// console.log(rightSRDS);
+	// 		// console.log(xFrom+" "+yFrom + "->"+xTo+ " " + yTo);
+	// 	}
 
-		this.boardData = 
-		{
-			xFrom: xFrom,
-			yFrom: yFrom,
-			xTo: xTo,
-			yTo: yTo
-		};
-	}
+	// 	this.boardData = 
+	// 	{
+	// 		xFrom: xFrom,
+	// 		yFrom: yFrom,
+	// 		xTo: xTo,
+	// 		yTo: yTo
+	// 	};
+	// }
 
 	resize()
 	{
