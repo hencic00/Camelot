@@ -85,6 +85,7 @@ export default class GameWindow extends React.Component
 		window.addEventListener("resize", this.resize.bind(this));
 		document.onkeydown = function(event)
 		{
+
 			var x = event.which || event.keyCode;
 			if(x >= 48 && x <=57) //1234567890
 			{
@@ -100,6 +101,7 @@ export default class GameWindow extends React.Component
 			}
 			else if(x == 173) //- pomeni da smo sestavli do konca
 			{
+				console.log("Konec Paketa");
 				var explodeSRDS = this.srdsMove.split(">");
 				var leftSRDS = explodeSRDS[0].split(",");
 				var rightSRDS = explodeSRDS[1].split(",");
@@ -114,7 +116,7 @@ export default class GameWindow extends React.Component
 				// console.log(leftSRDS);
 				// console.log(rightSRDS);
 				console.log(xFrom+" "+yFrom + "->"+xTo+ " " + yTo);
-				
+
 				this.boardData = 
 				{
 					xFrom: xFrom,
