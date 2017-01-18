@@ -113,16 +113,17 @@ export default class GameWindow extends React.Component
 				// console.log(explodeSRDS);
 				// console.log(leftSRDS);
 				// console.log(rightSRDS);
-				// console.log(xFrom+" "+yFrom + "->"+xTo+ " " + yTo);
+				console.log(xFrom+" "+yFrom + "->"+xTo+ " " + yTo);
+				
+				this.boardData = 
+				{
+					xFrom: xFrom,
+					yFrom: yFrom,
+					xTo: xTo,
+					yTo: yTo
+				};
 			}
 
-			this.boardData = 
-			{
-				xFrom: xFrom,
-				yFrom: yFrom,
-				xTo: xTo,
-				yTo: yTo
-			};
 		};
 
 		document.querySelector('.switch').addEventListener('mouseup', this.endTurn.bind(this));
