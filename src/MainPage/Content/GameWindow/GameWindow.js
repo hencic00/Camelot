@@ -63,6 +63,8 @@ export default class GameWindow extends React.Component
 		this.castleMoves = {val: 0};
 		this.kje = {val: null};
 
+		this.srdsMove = '';
+
 		// this.prevMove = {val: 'MOVE'}; 
 		// this.prevFig = {val: '5,7'};
 		// this.details = {val: "wkokdwkpddkopwdkop"};
@@ -86,19 +88,19 @@ export default class GameWindow extends React.Component
 			var x = event.which || event.keyCode;
 			if(x >= 48 && x <=57) //1234567890
 			{
-				srdsMove += String.fromCharCode(x);
+				this.srdsMove += String.fromCharCode(x);
 			}
 			else if(x == 188) //,
 			{
-				srdsMove += ",";
+				this.srdsMove += ",";
 			}
 			else if(x == 88) //x
 			{
-				srdsMove += ">"
+				this.srdsMove += ">"
 			}
 			else if(x == 173) //- pomeni da smo sestavli do konca
 			{
-				var explodeSRDS = srdsMove.split(">");
+				var explodeSRDS = this.srdsMove.split(">");
 				var leftSRDS = explodeSRDS[0].split(",");
 				var rightSRDS = explodeSRDS[1].split(",");
 
