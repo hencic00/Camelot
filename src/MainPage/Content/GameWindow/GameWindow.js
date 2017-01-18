@@ -99,7 +99,7 @@ export default class GameWindow extends React.Component
 			{
 				this.srdsMove += ">"
 			}
-			else if(x == 189) //- pomeni da smo sestavli do konca
+			else if(x == 189 || x == 173) //- pomeni da smo sestavli do konca
 			{
 				console.log("Konec Paketa");
 				var explodeSRDS = this.srdsMove.split(">");
