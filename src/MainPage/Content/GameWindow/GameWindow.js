@@ -63,7 +63,7 @@ export default class GameWindow extends React.Component
 		this.castleMoves = {val: 0};
 		this.kje = {val: null};
 
-		this.srdsMove = '';
+		
 
 		// this.prevMove = {val: 'MOVE'}; 
 		// this.prevFig = {val: '5,7'};
@@ -80,6 +80,8 @@ export default class GameWindow extends React.Component
 		this.ples1 = 0;
 		this.ples2 = 0;
 		var toti = this;
+
+		this.srdsMove = "";
 
 		this.listenOnSocket();
 		window.addEventListener("resize", this.resize.bind(this));
@@ -124,7 +126,10 @@ export default class GameWindow extends React.Component
 					xTo: xTo,
 					yTo: yTo
 				};
+
+				this.srdsMove = "";
 			}
+			console.log(this.srdsMove);
 
 		};
 
