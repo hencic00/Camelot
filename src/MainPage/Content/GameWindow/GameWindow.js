@@ -85,8 +85,8 @@ export default class GameWindow extends React.Component
 		window.addEventListener("resize", this.resize.bind(this));
 		document.onkeydown = function(event)
 		{
-			console.log("Ples");
 			var x = event.which || event.keyCode;
+			console.log(x);
 			if(x >= 48 && x <=57) //1234567890
 			{
 				this.srdsMove += String.fromCharCode(x);
