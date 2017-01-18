@@ -252,6 +252,9 @@ export default class GameWindow extends React.Component
 			
 		});
 
+		
+
+
 
 		this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -260,6 +263,73 @@ export default class GameWindow extends React.Component
 		this.gameInfo.piece = null;
 
 		var texloader = new THREE.TextureLoader();
+
+		var xhrPles = new XMLHttpRequest();
+
+
+		this.sirina;
+		this.visina;
+
+		this.preCalcCosineLeft = new Array(8);
+		this.preCalcCosineRight = new Array(8);
+
+		this.snake = new Array(8);
+
+		for(var i = 0; i < 8; i++)
+		{
+			this.snake[i] = new Array(8);
+			this.preCalcCosineLeft[i] = new Array(8);
+			this.preCalcCosineRight[i] = new Array(8);
+		}
+
+		for(var i = 0; i < 8; i++)
+		{
+			for(var j = 0; j < 8; j++)
+			{
+				this.snake[i][j] = 0;
+				this.preCalcCosineLeft[i][j] = 0;
+				this.preCalcCosineRight[i][j] = 0;
+			}
+		}
+
+		xhrPles.open("GET", "./compressed/leftCMP.webP", true); // binarno slika locljivost 512*512, velikost dat. je 512*512/8 (1 bit = 1 piksel!)
+		xhrPles.responseType = "arraybuffer";
+
+		var teksturator = null;
+
+
+		xhrPles.onload = function(e)
+		{
+			// toti.sourceFigSelect = toti.recieveSoundCMP(xhr.response);
+			// console.log('compressed');
+
+			// console.log(xhrPles.response);
+			teksturator = toti.render_image(xhrPles);
+			toti.loadedStuff++;
+
+
+			var materialArray = [];
+			materialArray.push(teksturator);
+			materialArray.push(new THREE.MeshBasicMaterial( { map: texloader.load( 'images/skyBox/right.jpg', function(){toti.loadedStuff++; toti.allObjectsAreLoaded()} ) }));
+			materialArray.push(new THREE.MeshBasicMaterial( { map: texloader.load( 'images/skyBox/top.jpg', function(){toti.loadedStuff++; toti.allObjectsAreLoaded()} ) }));
+			materialArray.push(new THREE.MeshBasicMaterial( { map: texloader.load( 'images/skyBox/bottom.jpg', function(){toti.loadedStuff++; toti.allObjectsAreLoaded()} ) }));
+			materialArray.push(new THREE.MeshBasicMaterial( { map: texloader.load( 'images/skyBox/back.jpg', function(){toti.loadedStuff++; toti.allObjectsAreLoaded()} ) }));
+			materialArray.push(new THREE.MeshBasicMaterial( { map: texloader.load( 'images/skyBox/front.jpg', function(){toti.loadedStuff++; toti.allObjectsAreLoaded()} ) }));
+
+			for (var i = 0; i < 6; i++)
+			{
+			   materialArray[i].side = THREE.BackSide;
+			}
+			var skyboxMaterial = new THREE.MeshFaceMaterial( materialArray );
+			var skyboxGeom = new THREE.CubeGeometry( 100, 100, 100, 1, 1, 1 );
+			var skybox = new THREE.Mesh( skyboxGeom, skyboxMaterial );
+
+			toti.vse.add(skybox);
+				
+				
+		}
+
+		xhrPles.send();
 
 		/*Les za mizo*/
 		// var woodTex = texloader.load( 'textures/wood.jpg', function()
@@ -316,6 +386,7 @@ export default class GameWindow extends React.Component
 		xhr2.open("GET", "./sounds/CartoonL.mdct", true); // binarno slika locljivost 512*512, velikost dat. je 512*512/8 (1 bit = 1 piksel!)
 		xhr2.responseType = "arraybuffer";
 
+
 		xhr2.onload = function(e) {
 
 				toti.sourceMakeMove = toti.recieveSoundCMP(xhr2.response);
@@ -332,29 +403,15 @@ export default class GameWindow extends React.Component
 		// skybox //
 		////////////
 
-		var materialArray = [];
-		materialArray.push(new THREE.MeshBasicMaterial( { map: texloader.load( 'images/skyBox/left.jpg', function(){toti.loadedStuff++; toti.allObjectsAreLoaded()}) }));
-		materialArray.push(new THREE.MeshBasicMaterial( { map: texloader.load( 'images/skyBox/right.jpg', function(){toti.loadedStuff++; toti.allObjectsAreLoaded()} ) }));
-		materialArray.push(new THREE.MeshBasicMaterial( { map: texloader.load( 'images/skyBox/top.jpg', function(){toti.loadedStuff++; toti.allObjectsAreLoaded()} ) }));
-		materialArray.push(new THREE.MeshBasicMaterial( { map: texloader.load( 'images/skyBox/bottom.jpg', function(){toti.loadedStuff++; toti.allObjectsAreLoaded()} ) }));
-		materialArray.push(new THREE.MeshBasicMaterial( { map: texloader.load( 'images/skyBox/back.jpg', function(){toti.loadedStuff++; toti.allObjectsAreLoaded()} ) }));
-		materialArray.push(new THREE.MeshBasicMaterial( { map: texloader.load( 'images/skyBox/front.jpg', function(){toti.loadedStuff++; toti.allObjectsAreLoaded()} ) }));
-
-		for (var i = 0; i < 6; i++)
-		{
-		   materialArray[i].side = THREE.BackSide;
-		}
-		var skyboxMaterial = new THREE.MeshFaceMaterial( materialArray );
-		var skyboxGeom = new THREE.CubeGeometry( 100, 100, 100, 1, 1, 1 );
-		var skybox = new THREE.Mesh( skyboxGeom, skyboxMaterial );
+		
 
 
 		// skybox.rotation.y = -0.29;
 		// skybox.rotation.x = 0.49;
 
-		this.scene.add( skybox );
+		// this.scene.add( skybox );
 
-		this.vse.add(skybox);
+		
 		
 
 		const pointLight = new THREE.PointLight(0xFFFFFF, 1.0);
@@ -370,47 +427,551 @@ export default class GameWindow extends React.Component
 		this.vse.add(pointLight); 
 	}
 
-	// receiveBoard(event)
-	// {
-	// 	var x = event.which || event.keyCode;
-	// 	if(x >= 48 && x <=57) //1234567890
-	// 	{
-	// 		srdsMove += String.fromCharCode(x);
-	// 	}
-	// 	else if(x == 188) //,
-	// 	{
-	// 		srdsMove += ",";
-	// 	}
-	// 	else if(x == 88) //x
-	// 	{
-	// 		srdsMove += ">"
-	// 	}
-	// 	else if(x == 173) //- pomeni da smo sestavli do konca
-	// 	{
-	// 		var explodeSRDS = srdsMove.split(">");
-	// 		var leftSRDS = explodeSRDS[0].split(",");
-	// 		var rightSRDS = explodeSRDS[1].split(",");
 
-	// 		var xFrom = 16 - parseInt(leftSRDS[0]);
-	// 		var yFrom = 12 - parseInt(leftSRDS[1]);
+	snakeInverseTransform(destination, zamikY, zamikX, snake, snakeTransformed)						//OK
+	{
+		for(var i = 0; i < 8; i++)
+		{
+			for(var j = 0; j < 8; j++)
+			{
+				destination[zamikY+i][zamikX+j] = snakeTransformed[snake[i][j]];
+			}
+		}
+		return destination;
+	}
 
-	// 		var xTo = 16 - parseInt(rightSRDS[0]);
-	// 		var yTo = 12 - parseInt(rightSRDS[1]);
+	undoVP8(source, predikcija, zamikY, zamikX)									
+	{
+		if(predikcija[zamikY/8][zamikX/8] == 0)
+		{
+			for(var i = 0; i < 8; i++)
+			{
+				for(var j = 0; j < 8; j++)
+				{
+					source[zamikY+i][zamikX+j] += source[zamikY-1][zamikX+j];
+				}
+			}
+		}
+		else if(predikcija[zamikY/8][zamikX/8] == 1)
+		{
+			for(var i = 0; i < 8; i++)
+			{
+				for(var j = 0; j < 8; j++)
+				{
+					source[zamikY+i][zamikX+j] += source[zamikY+i][zamikX-1];
+				}
+			}
+		}
+		else if(predikcija[zamikY/8][zamikX/8] == 2)
+		{
+			var DCpred = 0;
 
-	// 		// console.log(explodeSRDS);
-	// 		// console.log(leftSRDS);
-	// 		// console.log(rightSRDS);
-	// 		// console.log(xFrom+" "+yFrom + "->"+xTo+ " " + yTo);
-	// 	}
+			for(var i = 0; i < 8; i++)
+			{
+				DCpred += source[zamikY+i][zamikX-1];
+			}
 
-	// 	this.boardData = 
-	// 	{
-	// 		xFrom: xFrom,
-	// 		yFrom: yFrom,
-	// 		xTo: xTo,
-	// 		yTo: yTo
-	// 	};
-	// }
+			for(var i = 0; i < 8; i++)
+			{
+				DCpred += source[zamikY-1][zamikX+i];
+			}
+
+			DCpred = Number(Math.floor(DCpred/16.0));
+
+			for(var i = 0; i < 8; i++)
+			{
+				for(var j = 0; j < 8; j++)
+				{
+					source[zamikY + i][zamikX +j] += DCpred;
+				}
+			}
+		}
+		else if(predikcija[zamikY/8][zamikX/8] == 3)
+		{
+			for(var i = 0; i < 8; i++)
+			{
+				for(var j = 0; j < 8; j++)
+				{
+					source[zamikY+i][zamikX+j] += Number((source[zamikY + i][zamikX - 1] + source[zamikY - 1][zamikX + j] - source[zamikY - 1][zamikX - 1]) % 255);
+				}
+			}
+		}
+
+		return source;
+	}
+
+	undoDCTpartial(source, odmikY, odmikX)																// OK
+	{
+		var temp = 1.0 / Math.sqrt(2);
+		var C = [temp,1,1,1,1,1,1,1];
+		var sum = 0;
+
+		var konec = new Array(8);
+		for(var i = 0; i < 8; i++)
+		{
+			konec[i] = new Array(8);
+		}
+
+		for(var x = 0; x < 8; x++)
+		{
+			for(var y = 0; y < 8; y++)
+			{
+				sum = 0;
+
+				for(var u = 0; u < 8; u++)
+				{
+					for(var v = 0; v < 8; v++)
+					{
+						sum += C[u] * C[v] * source[odmikY + u][odmikX + v] * this.preCalcCosineLeft[x][u] * this.preCalcCosineRight[y][v];
+					}
+				}
+				konec[x][y] = Number(Math.round(0.25*sum));
+			}
+		}
+
+		for(var i = 0; i < 8; i++)
+		{
+			for(var j = 0; j < 8; j++)
+			{
+				source[odmikY+i][odmikX+j] = konec[i][j]
+			}
+		}
+
+		return source;
+	}
+
+	undoDCT(source)																					// OK
+	{
+		for(var i = 0; i < this.visina; i += 8)
+		{
+			for(var j = 0; j < this.sirina; j += 8)
+			{
+				source = this.undoDCTpartial(source,i,j);
+			}
+		}
+
+		return source;
+	}
+
+	generatePrecalcCosine_Decompression()																// OK
+	{
+		var piDivBySixteen = Math.PI/16;
+
+		for(var x = 0; x < 8; x++)
+		{
+			for(var u = 0; u < 8; u++)
+			{
+				this.preCalcCosineLeft[x][u] += Math.cos((2*x+1)*u*piDivBySixteen);
+			}
+		}
+
+		for(var y = 0; y < 8; y++)
+		{
+			for(var v = 0; v < 8; v++)
+			{
+				this.preCalcCosineRight[y][v] = Math.cos((2*y+1)*v*piDivBySixteen);
+			}
+		}
+	}
+
+	initSnake()																						// OK
+	{
+		var counter = 1;
+		var xPos = 0;
+		var xPremik = 1;
+		var yPos = 0;
+		var yPremik = 1;
+
+		this.snake[0][0] = 0;
+
+		while(counter < 63)
+		{
+			if(yPos == 0 || yPos == 7)
+			{
+				xPos = xPos + 1;
+				this.snake[yPos][xPos] = counter;
+				counter = counter + 1;
+
+				if(yPos == 0)
+				{
+					xPremik = -1;
+					yPremik = 1;
+				}
+				else
+				{
+					xPremik = 1;
+					yPremik = -1;
+				}
+			}
+			else if(xPos == 0 || xPos == 7)
+			{
+				yPos = yPos + 1;
+				this.snake[yPos][xPos] = counter;
+				counter = counter + 1;
+
+				if(xPos == 0)
+				{
+					xPremik	= 1;
+					yPremik = -1;
+				}
+				else
+				{
+					xPremik = -1;
+					yPremik = 1;
+				}
+			}
+			xPos = xPos + xPremik;
+			yPos = yPos + yPremik;
+			this.snake[yPos][xPos] = counter;
+			counter = counter + 1;
+		}
+		this.snake[7][7] = counter;
+	}
+
+	dobiVrstoPredikcije(beriindeks, prebrano,  prebraniindeks)						
+	{
+		var tmpVrni = this.preberiNaslednjegaStisnjenegaDamjan(prebrano,beriindeks,prebraniindeks);
+		var tmp = tmpVrni[0];
+		beriindeks = tmpVrni[1];
+		prebraniindeks = tmpVrni[2];
+
+		tmp = tmp << 1;
+
+		var tmpVrni1 = this.preberiNaslednjegaStisnjenegaDamjan(prebrano,beriindeks,prebraniindeks);
+		tmp += tmpVrni1[0];
+		beriindeks = tmpVrni1[1];
+		prebraniindeks = tmpVrni1[2];
+
+		var vrni = [tmp, beriindeks, prebraniindeks];
+		return vrni;
+	}
+
+	preberiNaslednjegaStisnjenegaDamjan(prebrano, vhodBIndeks, vhodPIndex)						
+	{
+		if(vhodBIndeks < 0)
+		{
+			vhodBIndeks = 14;
+			vhodPIndex = vhodPIndex + 1;
+		}
+		else
+		{
+			vhodBIndeks = vhodBIndeks - 1;
+		}
+
+		var stTemp = vhodBIndeks + 1;
+		var tmp = this.poglejNtiBit(prebrano[vhodPIndex], stTemp);
+
+		var vrni = [tmp, vhodBIndeks, vhodPIndex];
+		return vrni;
+	}
+
+	dekodirajAC(indeksBeri, prebrano, indeksPrebrano)
+	{
+		var dolzina = 0;
+		for(var i = 0; i < 4; i++)
+		{
+			dolzina = Number(dolzina<<1);
+			var vrni = this.preberiNaslednjegaStisnjenegaDamjan(prebrano, indeksBeri, indeksPrebrano);
+			dolzina |= Number(vrni[0]);
+			indeksBeri = vrni[1];
+			indeksPrebrano = vrni[2];
+		}
+
+		var vrni = this.preberiNaslednjegaStisnjenegaDamjan(prebrano, indeksBeri, indeksPrebrano);
+		var negCheck = vrni[0];
+		indeksBeri = vrni[1];
+		indeksPrebrano = vrni[2];
+
+		var zadnjaVrednost = 0;
+
+		if(negCheck == true)
+		{
+			for(var i = 0; i < 16 - dolzina; i++)
+			{
+				zadnjaVrednost <<= 1;
+				zadnjaVrednost |= Number(1);
+			}
+		}
+
+		zadnjaVrednost <<= 1;
+		zadnjaVrednost |= Number(negCheck);
+
+		for(var i = 0; i < dolzina - 1; i++)
+		{
+			zadnjaVrednost = Number(zadnjaVrednost<<1);
+			var vrni1 = this.preberiNaslednjegaStisnjenegaDamjan(prebrano, indeksBeri, indeksPrebrano);
+			zadnjaVrednost |= Number(vrni1[0]);
+			indeksBeri = vrni1[1];
+			indeksPrebrano = vrni1[2];
+		}
+
+		var vrni = [zadnjaVrednost, indeksBeri, indeksPrebrano];
+		return vrni;
+	}
+
+
+	dekodirajRLE(BeremIndeks, prebrano, PrebranoIndeks)
+	{
+		var dekodirani = new Int16Array(64);
+		var decodedCount = 0;
+		var zadnjaVrednost = 0;
+		var dolzina = 0;
+
+		var vrni = this.preberiNaslednjegaStisnjenegaDamjan(prebrano, BeremIndeks, PrebranoIndeks);
+		var negCheck = vrni[0];
+		BeremIndeks = vrni[1];
+		PrebranoIndeks = vrni[2];
+
+		if(negCheck == true)
+		{
+			for(var i = 0; i < 4; i++)
+			{
+				zadnjaVrednost <<= 1;
+				zadnjaVrednost |= Number(1);
+			}
+		}
+
+		zadnjaVrednost <<= 1;
+		zadnjaVrednost |= Number(negCheck);
+
+		for(var i = 0; i < 11; i++)
+		{
+			zadnjaVrednost = zadnjaVrednost<<1;
+
+			var vrni1 = this.preberiNaslednjegaStisnjenegaDamjan(prebrano, BeremIndeks, PrebranoIndeks)
+
+			zadnjaVrednost |= Number(vrni1[0]);
+
+			BeremIndeks = vrni1[1];
+			PrebranoIndeks = vrni1[2];
+		}
+
+		dekodirani[0] = zadnjaVrednost;
+		decodedCount++;
+
+		while(decodedCount < 64)
+		{
+			var tmpNekaj = this.preberiNaslednjegaStisnjenegaDamjan(prebrano, BeremIndeks, PrebranoIndeks);
+			BeremIndeks = tmpNekaj[1];
+			PrebranoIndeks = tmpNekaj[2];
+
+			if(tmpNekaj[0])
+			{
+				var vrnjenoAC = this.dekodirajAC(BeremIndeks, prebrano, PrebranoIndeks);
+				dekodirani[decodedCount] = vrnjenoAC[0];
+				BeremIndeks = vrnjenoAC[1];
+				PrebranoIndeks = vrnjenoAC[2];
+				decodedCount++;
+			}
+			else
+			{
+				dolzina = 0;
+				
+				for(var i = 0; i < 6; i++)
+				{
+					dolzina = Number(dolzina<<1);
+					var vrni2 = this.preberiNaslednjegaStisnjenegaDamjan(prebrano, BeremIndeks, PrebranoIndeks);
+					dolzina |= Number(vrni2[0]);
+					BeremIndeks = vrni2[1];
+					PrebranoIndeks = vrni2[2];
+				}
+
+				for(var i = 0; i < dolzina; i++)
+				{
+					dekodirani[decodedCount] = 0;
+					decodedCount++;
+				}
+
+				if(decodedCount < 64)
+				{
+					var vrnjenoAC1 = this.dekodirajAC(BeremIndeks, prebrano, PrebranoIndeks);
+					dekodirani[decodedCount] = vrnjenoAC1[0];
+					BeremIndeks = vrnjenoAC1[1];
+					PrebranoIndeks = vrnjenoAC1[2];
+					decodedCount++;
+				}
+			}
+		}
+
+		var vrni = [dekodirani, BeremIndeks, PrebranoIndeks];
+		return vrni;
+	}
+
+	razsiriBarvniKanal(slikaVhod, BeremIndeks, PrebranoIndeks, prebrano)
+	{	
+		var slika = slikaVhod;
+
+		var predikcija = new Array(this.visina/8);
+		for(var i = 0; i < this.visina/8; i++)
+		{
+			predikcija[i] = new Array(this.visina/8);
+		}
+
+		for(var j = 0; j < this.sirina/8; j++)
+		{
+			predikcija[0][j] = 4;
+
+
+			var whatVrnjeno = this.dekodirajRLE(BeremIndeks, prebrano, PrebranoIndeks);
+
+			var what = whatVrnjeno[0];
+			BeremIndeks =  whatVrnjeno[1];
+			PrebranoIndeks = whatVrnjeno[2];
+
+			slika = this.snakeInverseTransform(slika, 0, j*8, this.snake, what);
+		}
+
+		for(var i = 1; i < this.visina/8; i++)
+		{
+			predikcija[i][0] = 4;
+
+			var whatVrnjeno = this.dekodirajRLE(BeremIndeks, prebrano, PrebranoIndeks);
+
+			var what = whatVrnjeno[0];
+			BeremIndeks =  whatVrnjeno[1];
+			PrebranoIndeks = whatVrnjeno[2];
+
+			slika = this.snakeInverseTransform(slika, i*8, 0, this.snake, what);
+
+			for(var j = 1; j < this.sirina/8; j++)
+			{
+				var vrnjeno = this.dobiVrstoPredikcije(BeremIndeks,prebrano,PrebranoIndeks);
+				predikcija[i][j] = vrnjeno[0];
+				BeremIndeks = vrnjeno[1];
+				PrebranoIndeks = vrnjeno[2];
+
+				var whatVrnjeno1 = this.dekodirajRLE(BeremIndeks, prebrano, PrebranoIndeks);
+				var what1 = whatVrnjeno1[0];
+				BeremIndeks = whatVrnjeno1[1];
+				PrebranoIndeks = whatVrnjeno1[2];
+
+				slika = this.snakeInverseTransform(slika, i*8, j*8, this.snake, what1);
+			}
+		}
+
+		slika = this.undoDCT(slika);
+
+		for(var i = 8; i < this.visina; i += 8)
+		{
+			for(var j = 8; j < this.sirina; j += 8)
+			{
+				slika = this.undoVP8(slika, predikcija, i, j);
+			}
+		}
+
+		var vrni = [slika,BeremIndeks, PrebranoIndeks];
+
+		return vrni;
+	}
+
+	render_image(xhr)
+	{
+		// renderer = new THREE.WebGLRenderer();
+		// renderer.setClearColor(0xFFFFFF,0.1);
+		// renderer.setSize(512,512);
+		// document.querySelector('#WebGL_canvas').appendChild(renderer.domElement);
+
+		// scene = new THREE.Scene();
+
+		// camera = new THREE.PerspectiveCamera(70,1.0,1,1000);
+		// scene.add(camera);
+
+		this.initSnake();
+		this.generatePrecalcCosine_Decompression();
+
+		var beremIndex = 15;
+		var prebranoIndex = 0;
+
+		var preberi = new Int16Array(xhr.response);
+		this.sirina = Number(preberi[0]);
+		this.visina = Number(preberi[1]);
+
+		var prebrano = preberi.slice(2);
+
+		var kanalR = new Array(this.visina);
+		var kanalG = new Array(this.visina);
+		var kanalB = new Array(this.visina);
+
+		var kanalR1 = new Array(this.visina);
+		var kanalG1 = new Array(this.visina);
+		var kanalB1 = new Array(this.visina);
+
+		for(var i = 0; i < this.sirina; i++)
+		{
+			kanalR[i] = new Array(this.sirina);
+			kanalG[i] = new Array(this.sirina);
+			kanalB[i] = new Array(this.sirina);
+
+			kanalR1[i] = new Array(this.sirina);
+			kanalG1[i] = new Array(this.sirina);
+			kanalB1[i] = new Array(this.sirina);
+
+			for(var j = 0; j < this.visina; j++)
+			{
+				kanalR[i][j] = 0;
+				kanalG[i][j] = 0;
+				kanalB[i][j] = 0;
+
+				kanalR1[i][j] = 0;
+				kanalG1[i][j] = 0;
+				kanalB1[i][j] = 0;
+			}
+		}
+
+		var prvic = this.razsiriBarvniKanal(kanalR,beremIndex,prebranoIndex,prebrano);
+		kanalR = prvic[0];
+		beremIndex = prvic[1];
+		prebranoIndex = prvic[2];
+
+		var drugic = this.razsiriBarvniKanal(kanalG,beremIndex,prebranoIndex,prebrano);
+		kanalG = drugic[0];
+		beremIndex = drugic[1];
+		prebranoIndex = drugic[2];
+
+		var tretjic = this.razsiriBarvniKanal(kanalB,beremIndex,prebranoIndex,prebrano);
+		kanalB = tretjic[0];
+		beremIndex = tretjic[1];
+		prebranoIndex = tretjic[2];
+
+
+		for(var i = 0; i < this.sirina; ++i)
+		{
+		   for(var j = 0; j < this.visina; ++j)
+		   {
+		      kanalR1[i][j] = kanalR[511-i][j];
+		      kanalG1[i][j] = kanalG[511-i][j];
+		      kanalB1[i][j] = kanalB[511-i][j];
+		   }
+		}
+
+		var tex_data = new Uint8Array(this.sirina*this.visina*3);
+
+
+		for(var i = 0, ii = 0; i < this.sirina; i++)
+		{
+			for(var j = 0; j < this.visina; j++)
+			{
+				tex_data[ii++] = kanalR1[i][j];
+				tex_data[ii++] = kanalG1[i][j];
+				tex_data[ii++] = kanalB1[i][j];
+			}
+		}
+
+		var tex = new THREE.DataTexture(tex_data, this.sirina, this.visina, THREE.RGBFormat);
+		tex.needsUpdate = true;
+
+		var geometry = new THREE.CubeGeometry(15,15,15);
+		var material = new THREE.MeshBasicMaterial({map: tex});
+
+		return material;
+
+		// mesh = new THREE.Mesh(geometry,material);
+		// mesh.position.z = -20;
+		// scene.add(mesh);
+
+		// renderer.render(scene,camera);
+
+	}
 
 	resize()
 	{
