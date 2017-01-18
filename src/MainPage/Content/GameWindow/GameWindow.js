@@ -77,16 +77,20 @@ export default class GameWindow extends React.Component
 		this.ples = 0;
 		this.ples1 = 0;
 		this.ples2 = 0;
+		var toti = this;
 
 		this.listenOnSocket();
 		window.addEventListener("resize", this.resize.bind(this));
+		document.onkeydown = function()
+		{
+			toti.receiveBoard();
+		};
 
 		document.querySelector('.switch').addEventListener('mouseup', this.endTurn.bind(this));
 
 
 		this.vse = new THREE.Group();
 
-		var toti = this;
 		
 		this.rayCaster = new THREE.Raycaster();
 		this.renderer = new THREE.WebGLRenderer();
@@ -113,7 +117,7 @@ export default class GameWindow extends React.Component
 		this.camera.position.y = 3;
 		this.camera.lookAt(new THREE.Vector3(0,0,0));
 
-		this.hjnToGameState("++/8/10/12/12/2AaaaaaaA2/3AaaaaA3/12/12/3BbbbbB3/2BbbbbbbB2/12/12/10/8/--");
+		this.gameState1 = this.hjnToGameState("++/8/10/12/12/2AaaaaaaA2/3AaaaaA3/12/12/3BbbbbB3/2BbbbbbbB2/12/12/10/8/--");
 
 
 		var jsonLoader = new THREE.JSONLoader();
@@ -315,9 +319,48 @@ export default class GameWindow extends React.Component
 		pointLight.shadowMapHeight = 1024; // default is 512. Beware! Laggy stuff
 
 		this.vse.add(pointLight); 
+	}
 
-		
+	receiveBoard()
+	{
+		var x = event.which || event.keyCode;
+		if(x >= 48 && x <=57) //1234567890
+		{
+			srdsMove += String.fromCharCode(x);
+		}
+		else if(x == 188) //,
+		{
+			srdsMove += ",";
+		}
+		else if(x == 88) //x
+		{
+			srdsMove += ">"
+		}
+		else if(x == 173) //- pomeni da smo sestavli do konca
+		{
+			var explodeSRDS = srdsMove.split(">");
+			var leftSRDS = explodeSRDS[0].split(",");
+			var rightSRDS = explodeSRDS[1].split(",");
 
+			var xFrom = 16 - parseInt(leftSRDS[0]);
+			var yFrom = 12 - parseInt(leftSRDS[1]);
+
+			var xTo = 16 - parseInt(rightSRDS[0]);
+			var yTo = 12 - parseInt(rightSRDS[1]);
+
+			// console.log(explodeSRDS);
+			// console.log(leftSRDS);
+			// console.log(rightSRDS);
+			// console.log(xFrom+" "+yFrom + "->"+xTo+ " " + yTo);
+		}
+
+		this.boardData = 
+		{
+			xFrom: xFrom,
+			yFrom: yFrom,
+			xTo: xTo,
+			yTo: yTo
+		};
 	}
 
 	resize()
@@ -1354,9 +1397,7 @@ export default class GameWindow extends React.Component
 				}
 			}
 		}
-		this.gameState1 = emptyBoard;
-
-		// this.ples1(emptyBoard);
+		return emptyBoard;
 	}
 
 	gameStateToHJN(gameState)
@@ -1811,52 +1852,17 @@ export default class GameWindow extends React.Component
 
 		if (this.gameInfo.needsUpdate == true) 
 		{
-			// this.scene.children[0].rotation.y -= (this.mouse1.prevX - this.mouse1.X) * .05;
-			// this.scene.children[0].rotation.x -= (this.mouse1.prevY - this.mouse1.Y) * .05;
-
-			// this.scene.children[1].rotation.y -= (this.mouse1.prevX - this.mouse1.X) * .05;
-			// this.scene.children[1].rotation.x -= (this.mouse1.prevY - this.mouse1.Y) * .05;
 			this.scene.children[2].rotation.y -= (this.mouse1.prevX - this.mouse1.X) * .05;
 			this.scene.children[2].rotation.x -= (this.mouse1.prevY - this.mouse1.Y) * .05;
-
-			// console.log(this.scene);
-			// this.scene.children[3].rotation.y -= (this.mouse1.prevX - this.mouse1.X) * .05;
-			// this.scene.children[3].rotation.x -= (this.mouse1.prevY - this.mouse1.Y) * .05;
-			// this.scene.children[4].rotation.y -= (this.mouse1.prevX - this.mouse1.X) * .05;
-			// this.scene.children[4].rotation.x -= (this.mouse1.prevY - this.mouse1.Y) * .05;
-			// this.scene.children[5].rotation.y -= (this.mouse1.prevX - this.mouse1.X) * .05;
-			// this.scene.children[5].rotation.x -= (this.mouse1.prevY - this.mouse1.Y) * .05;
-			// this.scene.children[4].rotation.y -= (this.mouse1.prevX - this.mouse1.X) * .05;
-			// this.scene.children[4].rotation.x -= (this.mouse1.prevY - this.mouse1.Y) * .05;
-			// this.scene.children[5].rotation.y -= (this.mouse1.prevX - this.mouse1.X) * .05;
-			// this.scene.children[5].rotation.x -= (this.mouse1.prevY - this.mouse1.Y) * .05;
-			// this.scene.children[6].rotation.y -= (this.mouse1.prevX - this.mouse1.X) * .05;
-			// this.scene.children[6].rotation.x -= (this.mouse1.prevY - this.mouse1.Y) * .05;
-			// this.scene.children[7].rotation.y -= (this.mouse1.prevX - this.mouse1.X) * .05;
-			// this.scene.children[7].rotation.x -= (this.mouse1.prevY - this.mouse1.Y) * .05;
-
-			// this.ples +=  (this.mouse1.prevX - this.mouse1.X)*-0.05;
-			// this.ples1 += (this.mouse1.prevY - this.mouse1.Y)*-0.05;
-			// this.ples2 += ((this.mouse1.prevX - this.mouse1.X)*-0.05 + (this.mouse1.prevY - this.mouse1.Y)*-0.05);
-
-			// this.camera.position.x =  Math.sin( this.ples )*20;
-			// // this.camera.position.y =  Math.sin( this.ples1 )*20;
-			// this.camera.position.z =  Math.cos( this.ples)*20 - 16.5;
-
-			// // this.camera.up.set( 0, 0, 1 + Math.sin( this.ples1 )*20 - 1 );
-			// this.camera.lookAt( new THREE.Vector3( 0, 0, -16.5 ));
 
 			this.gameInfo.needsUpdate = false;
 
 			document.body.style.cursor = "auto";
-
-			
-
 		}
 		else if(this.gameInfo.canSelect == true && this.myTurn == true)
 		{
 			this.rayCaster.setFromCamera( this.mouse, this.camera );
-			// var test = this.scene.children[4].clone();
+
 			var intersects = this.rayCaster.intersectObjects( this.scene.children[2].children, true);
 
 			if (intersects.length > 0)
@@ -2033,33 +2039,20 @@ export default class GameWindow extends React.Component
 						}
 					}
 				}
-				
-
-				
-			}
+			}	
+		}
 
 
-			// /*-------------------Temprary je to, ignoraj---------------------*/
-			// if (this.mouse1.leftDown == true) 
-			// {
-			// 	intersects = this.rayCaster.intersectObjects( this.scene.children[4].children, true );
+		if (this.boardData != undefined || this.boardData != null)
+		{
 
-			// 	if (intersects.length > 0) 
-			// 	{
-			// 		// console.log(intersects[0].object.position.x);
-			// 		this.gameInfo.travelToX = intersects[0].object.position.x - this.gameInfo.xMin;
-			// 		this.gameInfo.travelToY = intersects[0].object.position.z - this.gameInfo.zMin;
-			// 	}
-			// }
+			this.movePieceAtIndex(this.boardData.xFrom, this.boardData.yFrom, this.boardData.xTo, this.boardData.yTo);
+			this.boardData = null;
 
-
-			
 		}
 
 		requestAnimationFrame(this.update.bind(this));//Contonue
 		this.renderer.render( this.scene, this.camera );//da loop
-		// this.controls.update();
-   			
 	}
 
 	render()
