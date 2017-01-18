@@ -83,6 +83,8 @@ export default class GameWindow extends React.Component
 
 		this.srdsMove = "";
 
+		var toti = this;
+
 		this.listenOnSocket();
 		window.addEventListener("resize", this.resize.bind(this));
 		document.onkeydown = function(event)
@@ -91,20 +93,20 @@ export default class GameWindow extends React.Component
 			console.log(x);
 			if(x >= 48 && x <=57) //1234567890
 			{
-				this.srdsMove += String.fromCharCode(x);
+				toti.srdsMove += String.fromCharCode(x);
 			}
 			else if(x == 188) //,
 			{
-				this.srdsMove += ",";
+				toti.srdsMove += ",";
 			}
 			else if(x == 88) //x
 			{
-				this.srdsMove += ">"
+				toti.srdsMove += ">"
 			}
 			else if(x == 189 || x == 173) //- pomeni da smo sestavli do konca
 			{
 				console.log("Konec Paketa");
-				var explodeSRDS = this.srdsMove.split(">");
+				var explodeSRDS = toti.srdsMove.split(">");
 				var leftSRDS = explodeSRDS[0].split(",");
 				var rightSRDS = explodeSRDS[1].split(",");
 
@@ -119,7 +121,7 @@ export default class GameWindow extends React.Component
 				// console.log(rightSRDS);
 				console.log(xFrom+" "+yFrom + "->"+xTo+ " " + yTo);
 
-				this.boardData = 
+				toti.boardData = 
 				{
 					xFrom: xFrom,
 					yFrom: yFrom,
@@ -127,9 +129,9 @@ export default class GameWindow extends React.Component
 					yTo: yTo
 				};
 
-				this.srdsMove = "";
+				toti.srdsMove = "";
 			}
-			console.log(this.srdsMove);
+			console.log(toti.srdsMove);
 
 		};
 
